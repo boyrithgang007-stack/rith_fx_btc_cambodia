@@ -1,0 +1,2 @@
+export type ImageEvidence={kind:"chart"|"table"|"other"|"unreadable";readability:"clear"|"partial"|"unreadable";symbol:string|null;timeframe:string|null;trend:"up"|"down"|"sideways"|"unclear";summary:string;visibleText:string[];visibleValues:{label:string;value:string|null;unit:string|null}[];observations:string[];limitations:string[]};
+export type ImageAnalysisReport={id:string;createdAt:number;model:string;width:number;height:number;evidence:ImageEvidence;tradeAction:"WAIT";basis:"image-only"};

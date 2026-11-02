@@ -1,0 +1,33 @@
+.market-app:is(.theme-light,.theme-dark) .macro-observatory .macro-cosmic-scene {
+  position:relative; min-width:0; width:100%; max-width:460px; align-self:center; justify-self:center;
+  border:1px solid #3ba7f240; border-radius:24px; overflow:hidden;
+  background:radial-gradient(ellipse at 50% 48%,#0f547b70,transparent 63%),radial-gradient(ellipse at 16% 18%,#6b36913b,transparent 55%),linear-gradient(145deg,#071326,#0a1d37 58%,#061020);
+  box-shadow:inset 0 1px #ffffff14,0 12px 30px #06102014;
+}
+.macro-cosmic-scene svg { display:block; width:100%; height:auto; }
+.macro-cosmic-scene .macro-earth-image { transform-origin:210px 210px; animation:macro-earth-turn 72s linear infinite; filter:drop-shadow(0 0 10px #3ba7f260); }
+.macro-context-orbit { position:absolute; inset:0; pointer-events:none; animation:macro-galaxy-orbit 36s linear infinite; }
+.macro-context-anchor { position:absolute; top:50%; left:24%; width:0; height:0; }
+.macro-context-upright { width:136px; pointer-events:auto; transform:translate(-50%,-50%); animation:macro-context-counterturn 36s linear infinite; }
+.macro-context-phase-1,.macro-context-phase-1 .macro-context-upright { animation-delay:-12s; }
+.macro-context-phase-2,.macro-context-phase-2 .macro-context-upright { animation-delay:-24s; }
+.macro-context-galaxy { display:block; width:48px; height:38px; margin:0 auto 3px; background:url('/images/market-galaxy-v1.png') center/contain no-repeat; filter:drop-shadow(0 0 5px #9f72ff80); animation:macro-galaxy-turn 15s linear infinite; }
+.market-app:is(.theme-light,.theme-dark) .macro-observatory .macro-context-label { padding:10px 12px; border-radius:14px; border:1px solid #77b8ee70; background:#0a203a; box-shadow:0 6px 18px #0004; text-align:center; }
+.market-app:is(.theme-light,.theme-dark) .macro-observatory .macro-context-label strong { color:#8ed3ff; font:700 12px/1.9 Arial,sans-serif; letter-spacing:1px; }
+.market-app:is(.theme-light,.theme-dark) .macro-observatory .macro-context-label p { margin:4px 0 0; color:#e8f6ff; font:400 13px/1.9 Arial,"Noto Sans Khmer","Khmer OS Battambang",sans-serif; }
+.macro-cosmic-scene .macro-cosmic-stars { animation:macro-star-pulse 8s ease-in-out infinite alternate; }
+.macro-cosmic-scene .macro-cosmic-caption { fill:#d1e8ff; font:10px Arial,sans-serif; letter-spacing:2px; }
+.macro-cosmic-scene.is-paused :is(.macro-earth-image,.macro-context-orbit,.macro-context-upright,.macro-context-galaxy,.macro-cosmic-stars),
+.macro-observatory.motion-paused .macro-cosmic-scene :is(.macro-earth-image,.macro-context-orbit,.macro-context-upright,.macro-context-galaxy,.macro-cosmic-stars) { animation-play-state:paused; }
+@keyframes macro-earth-turn { to { transform:rotate(360deg); } }
+@keyframes macro-galaxy-orbit { to { transform:rotate(360deg); } }
+@keyframes macro-galaxy-turn { to { transform:rotate(360deg); } }
+@keyframes macro-context-counterturn { from { transform:translate(-50%,-50%) rotate(0deg); } to { transform:translate(-50%,-50%) rotate(-360deg); } }
+@keyframes macro-star-pulse { from { opacity:.3; } to { opacity:.9; } }
+.market-app:is(.theme-light,.theme-dark) .macro-observatory .macro-hero { gap:24px; padding-bottom:76px; }
+@media(max-width:900px) { .market-app:is(.theme-light,.theme-dark) .macro-observatory .macro-hero { grid-template-columns:1fr; }.market-app:is(.theme-light,.theme-dark) .macro-observatory .macro-cosmic-scene { max-width:400px; } }
+@media(prefers-reduced-motion:reduce) {
+  .macro-cosmic-scene :is(.macro-earth-image,.macro-context-orbit,.macro-context-upright,.macro-context-galaxy,.macro-cosmic-stars) { animation:none; }
+  .macro-context-phase-1 { transform:rotate(120deg); }.macro-context-phase-1 .macro-context-upright { transform:translate(-50%,-50%) rotate(-120deg); }
+  .macro-context-phase-2 { transform:rotate(240deg); }.macro-context-phase-2 .macro-context-upright { transform:translate(-50%,-50%) rotate(-240deg); }
+}

@@ -1,0 +1,86 @@
+/* Walnut discovery scenes. Individual transforms preserve the scroll-scene transforms. */
+.auth-screen.theme-light .desktop-stage[data-active-scene="1"],
+.auth-screen.theme-light .desktop-stage .spatial-gallery,
+.auth-screen.theme-light .home-experience .home-features {
+  background:
+    linear-gradient(90deg, #180c0866, #b47b3e12 50%, #180c0870),
+    url('/brand/walnut-grain.svg') center / 640px 640px repeat;
+  color: #fff2df;
+}
+.auth-screen.theme-light .home-experience .home-features {
+  border-top: 2px solid #bca182;
+  border-bottom: 2px solid #2b1910;
+  box-shadow: inset 0 1px #f6d7b460, inset 0 12px 30px #170c0866;
+  perspective: 1200px;
+}
+.auth-screen.theme-light .home-feature-intro :is(h2, p, .home-eyebrow),
+.auth-screen.theme-light .spatial-gallery-heading h2,
+.auth-screen.theme-light .spatial-gallery-note {
+  color: #f6e7d5;
+}
+.auth-screen.theme-light .home-feature-intro h2 span,
+.auth-screen.theme-light .spatial-gallery-heading h2 em { color: #a9d9ff; }
+.auth-screen.theme-light .home-feature-intro p { color: #e0c6ad; }
+.auth-screen.theme-light .home-experience :is(.home-feature-card, .home-feature-card.feature-violet, .home-feature-card.feature-blue, .spatial-card) {
+  background:
+    linear-gradient(130deg, #fff2dc25, transparent 42%, #14090360),
+    url('/brand/walnut-grain.svg') center / 380px 380px repeat;
+  border: 2px solid #a7b8c3;
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 2px #21160f, inset 0 0 0 4px #d6c4ac65,
+    inset 0 1px 0 5px #fff0d424, 0 9px 0 #25160fe6, 0 24px 34px #13090480;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  animation: nr-walnut-float 7s ease-in-out infinite;
+  transition: rotate .4s ease, box-shadow .4s ease, border-color .4s ease;
+}
+.auth-screen.theme-light .home-experience :is(.home-feature-card:nth-of-type(2), .spatial-card-two) { animation-delay: -2.3s; }
+.auth-screen.theme-light .home-experience :is(.home-feature-card:nth-of-type(3), .spatial-card-three) { animation-delay: -4.6s; }
+.auth-screen.theme-light .home-experience :is(.home-feature-card, .spatial-card) :is(h3, p, small, span) {
+  color: #f4e6d8;
+  text-shadow: 0 1px 2px #1b0d09;
+}
+.auth-screen.theme-light .home-experience :is(.home-feature-card, .spatial-card) small { color: #b2dfff; }
+.auth-screen.theme-light .home-experience .home-feature-card .feature-art {
+  background: linear-gradient(145deg, #152c3ce8, #11212be8);
+  border: 1px solid #a8c0cf;
+  box-shadow: inset 0 2px 12px #020a1180, 0 3px 0 #21160d;
+  perspective: 600px;
+  transform-style: preserve-3d;
+}
+.auth-screen.theme-light .home-experience .art-radar i { animation: nr-walnut-orbit 12s linear infinite; }
+.auth-screen.theme-light .home-experience .art-radar i:nth-child(2) { animation-direction: reverse; animation-duration: 17s; }
+.auth-screen.theme-light .home-experience .art-wave i { animation: nr-walnut-bar 3s ease-in-out infinite; }
+.auth-screen.theme-light .home-experience .art-wave i:nth-child(2n) { animation-delay: -.9s; }
+.auth-screen.theme-light .home-experience .art-wave i:nth-child(3n) { animation-delay: -1.8s; }
+.auth-screen.theme-light .home-experience .art-chat > span { animation: nr-walnut-float 5s ease-in-out infinite; }
+.auth-screen.theme-light .home-experience.home-motion-paused :is(.home-feature-card, .spatial-card, .feature-art i, .art-chat > span) { animation-play-state: paused; }
+@keyframes nr-walnut-float {
+  0%, 100% { translate: 0 0 0; }
+  50% { translate: 0 -9px 12px; }
+}
+@keyframes nr-walnut-orbit { to { rotate: z 360deg; } }
+@keyframes nr-walnut-bar {
+  0%, 100% { translate: 0 0 0; }
+  50% { translate: 0 -5px 8px; }
+}
+@media (hover: hover) and (pointer: fine) {
+  .auth-screen.theme-light .home-experience:not(.home-motion-paused) :is(.home-feature-card, .spatial-card):hover {
+    rotate: y -5deg;
+    border-color: #b8e1ff;
+    box-shadow: inset 0 0 0 2px #21160f, inset 0 0 0 4px #d6c4ac65,
+      0 9px 0 #25160fe6, 0 30px 45px #13090499, 0 0 20px #7abce230;
+  }
+}
+@media (max-width: 760px) {
+  .auth-screen.theme-light .home-experience .home-feature-card { animation-name: nr-walnut-mobile-float; }
+  @keyframes nr-walnut-mobile-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -4px; } }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-screen.theme-light .home-experience :is(.home-feature-card, .spatial-card, .feature-art i, .art-chat > span) {
+    animation: none;
+    transition: none;
+    translate: none;
+    rotate: none;
+  }
+}

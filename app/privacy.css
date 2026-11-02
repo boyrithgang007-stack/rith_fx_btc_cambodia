@@ -1,0 +1,16 @@
+.privacy-page .connections-content { max-width:900px; }
+.privacy-page .connections-intro>p:last-child { max-width:760px; line-height:1.9; }
+.privacy-sections { display:grid; gap:14px; padding:24px 0 48px; }
+.privacy-sections>section,
+.privacy-review-note {
+  margin:0; padding:20px; border:1px solid var(--mode-border,#263547);
+  border-radius:14px; background:var(--mode-surface,#101a27); color:var(--mode-text,#e4edf5);
+}
+.privacy-sections h2 { margin:0 0 10px; font-size:18px; }
+.privacy-sections p,
+.privacy-sections li { color:var(--mode-muted,#9aafc1); line-height:1.9; }
+.privacy-sections ul { margin:0; padding-inline-start:24px; }
+.privacy-sections a { color:var(--mode-link,#45c7f4); }
+.privacy-review-note { border-style:dashed; }
+.access-screen .auth-privacy-link { margin:18px 0 0; text-align:center; font-size:13px; }
+.access-screen .auth-privacy-link a { color:var(--mode-link,#087eae); }

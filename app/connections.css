@@ -1,0 +1,61 @@
+.connections-page{min-height:100vh;background:#0a0b10;color:#f1f0f5}
+.connections-header{height:66px;padding:0 clamp(20px,5vw,72px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff12;background:#101116}
+.connections-brand,.connections-back{color:#f1f0f5;text-decoration:none}
+.connections-brand{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700;letter-spacing:1.6px}
+.connections-brand>span{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:linear-gradient(145deg,#bca6ff,#7655e7);color:#171124;font-size:18px}
+.connections-back{font-size:12px;color:#c5c0d2}
+.connections-back:hover{color:#c8b4ff}
+.account-section-nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px}
+.account-section-nav a{padding:9px 12px;border:1px solid #30303a;border-radius:7px;color:#aaa8b5;text-decoration:none;font-size:10px}
+.account-section-nav a[aria-current="page"],.account-section-nav a:hover{border-color:#8a72d0;color:#d1c1ff;background:#201c2c}
+.account-hub-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:26px 0}
+.account-hub-grid a{padding:19px;border:1px solid #292a32;border-radius:12px;background:#121319;color:#f1f0f5;text-decoration:none;transition:border-color .2s,transform .2s}
+.account-hub-grid a:hover{border-color:#8a72d0;transform:translateY(-2px)}
+.account-hub-grid a>span{color:#a993ec;font-size:9px;letter-spacing:1.4px}
+.account-hub-grid h2{margin:13px 0 6px;font-size:16px}
+.account-hub-grid p{margin:0 0 16px;color:#aaa8b5;font-size:11px}
+.account-hub-grid b{font-size:10px;color:#c4afff;font-weight:500}
+.connections-content{width:min(1080px,calc(100% - 40px));margin:0 auto;padding:48px 0 70px}
+.connections-eyebrow{margin:0 0 8px;color:#a993ec;font-size:9px;letter-spacing:1.8px}
+.connections-intro h1{margin:0;font-size:clamp(28px,4vw,40px);font-weight:600;letter-spacing:-1px}
+.connections-intro>p:last-child{max-width:650px;margin:12px 0 30px;color:#aaa8b5;font-size:13px;line-height:1.8}
+.connections-balance{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:24px 26px;border:1px solid #383343;border-radius:14px;background:radial-gradient(ellipse at 85% 0%,#34274c80,transparent 55%),#14131a}
+.connections-balance h2,.connection-section-heading h2,.connection-safety h2{margin:0;font-size:18px;font-weight:600}
+.connections-balance>div>p:last-child{max-width:650px;margin:10px 0 0;color:#aaa8b5;font-size:12px;line-height:1.8}
+.balance-placeholder{color:#b8a1fb;font-size:36px;font-weight:500}
+.connection-section{margin-top:34px}
+.connection-section-heading{display:flex;align-items:end;justify-content:space-between;gap:14px;margin-bottom:14px}
+.connection-section-heading>span{padding-bottom:3px;color:#8e8c98;font-size:10px;text-align:right}
+.connection-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.connection-card{min-height:156px;padding:17px;border:1px solid #292a32;border-radius:12px;background:#121319}
+.connection-card-heading{display:flex;align-items:center;justify-content:space-between}
+.connection-provider-mark{width:32px;height:32px;display:grid;place-items:center;border-radius:9px;background:#25222f;color:#c4afff;font-size:12px;font-weight:700}
+.connection-status{padding:5px 8px;border:1px solid #43404a;border-radius:20px;color:#aaa8b5;font-size:9px}
+.connection-card h3{margin:13px 0 4px;font-size:14px}
+.connection-card>p{margin:0;color:#96949f;font-size:10px}
+.connection-card button,.bank-connection-note button{min-height:32px;margin-top:14px;padding:0 11px;border:1px solid #32323b;border-radius:7px;background:#1a1b22;color:#83818c;font-size:10px;cursor:not-allowed}
+.bank-connection-note{display:flex;align-items:center;gap:16px;padding:19px;border:1px solid #292a32;border-radius:12px;background:#121319}
+.bank-note-icon{width:38px;height:38px;flex:none;display:grid;place-items:center;border-radius:10px;background:#202b2b;color:#9ddab8;font-size:21px}
+.bank-connection-note>div{flex:1}
+.bank-connection-note h3{margin:0 0 6px;font-size:13px}
+.bank-connection-note p{margin:0;color:#aaa8b5;font-size:11px;line-height:1.8}
+.bank-connection-note button{flex:none;margin:0}
+.connection-safety{margin-top:34px;padding:22px 24px;border:1px solid #46402d;border-radius:12px;background:#19170f}
+.connection-safety .connections-eyebrow{color:#e1c98c}
+.connection-safety h2{margin-bottom:12px}
+.connection-safety ul{display:grid;gap:8px;margin:0;padding-left:19px;color:#c0bdaf;font-size:11px;line-height:1.8}
+.connections-unavailable{margin:15px 0 0;padding-top:13px;border-top:1px solid #ffffff18;color:#dbca9f;font-size:10px;line-height:1.8}
+@media(max-width:700px){
+ .connections-header{height:60px;padding:0 16px}
+ .connections-brand{font-size:10px;letter-spacing:1px}
+ .connections-back{font-size:10px}
+ .connections-content{width:calc(100% - 32px);padding:32px 0 48px}
+ .account-hub-grid{grid-template-columns:1fr}
+ .connections-balance{padding:19px;align-items:flex-start}
+ .connection-grid{grid-template-columns:1fr}
+ .connection-section-heading{align-items:flex-start;flex-direction:column;gap:6px}
+ .connection-section-heading>span{text-align:left}
+ .bank-connection-note{align-items:flex-start;flex-wrap:wrap}
+ .bank-connection-note>div{min-width:calc(100% - 60px)}
+ .bank-connection-note button{margin-left:54px}
+}

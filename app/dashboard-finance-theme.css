@@ -1,0 +1,166 @@
+/* Dashboard-only palette and surfaces inspired by the RFX metallic brand. */
+.market-app.theme-dark,
+.market-app.cinematic-terminal.theme-dark {
+  --mode-bg:#0a1019;
+  --mode-surface:rgba(17,26,38,.84);
+  --mode-inset:rgba(10,18,29,.9);
+  --mode-border:rgba(148,173,196,.17);
+  --mode-text:#e7edf4;
+  --mode-muted:#9cabb9;
+  --mode-accent:#45c7f4;
+  --mode-link:#88dfff;
+  --mode-active:rgba(38,128,184,.18);
+  --mode-edge:#05080d;
+  --mode-shadow:0 14px 34px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.035);
+  --chart-one:#45c7f4;
+  --chart-two:#42d6a0;
+  --chart-three:#3183e7;
+  --chart-four:#68dce9;
+  --chart-five:#c3d7e8;
+}
+.market-app.theme-light,
+.market-app.cinematic-terminal.theme-light {
+  --mode-bg:#eef2f6;
+  --mode-surface:rgba(255,255,255,.82);
+  --mode-inset:rgba(229,236,243,.92);
+  --mode-border:rgba(74,101,125,.2);
+  --mode-text:#1b2a38;
+  --mode-muted:#617384;
+  --mode-accent:#1689c7;
+  --mode-link:#087eae;
+  --mode-active:rgba(38,139,194,.12);
+  --mode-edge:#d6e0e8;
+  --mode-shadow:0 12px 28px rgba(23,44,63,.08),inset 0 1px rgba(255,255,255,.9);
+  --chart-one:#1689c7;
+  --chart-two:#0c9b68;
+  --chart-three:#326fbd;
+  --chart-four:#39aebc;
+  --chart-five:#7a96ad;
+}
+
+.market-app.theme-dark .dashboard-workspace,
+.market-app.theme-light .dashboard-workspace {
+  background-color:var(--mode-bg);
+  background-image:
+    radial-gradient(ellipse at 75% 0%,color-mix(in srgb,var(--mode-accent) 9%,transparent),transparent 42%),
+    linear-gradient(color-mix(in srgb,var(--mode-accent) 3%,transparent) 1px,transparent 1px),
+    linear-gradient(90deg,color-mix(in srgb,var(--mode-accent) 3%,transparent) 1px,transparent 1px);
+  background-size:auto,40px 40px,40px 40px;
+}
+.market-app.cinematic-terminal:is(.theme-light,.theme-dark) .dashboard-workspace {
+  background-color:transparent!important;
+  background-image:
+    radial-gradient(ellipse at 75% 0%,color-mix(in srgb,var(--mode-accent) 9%,transparent),transparent 42%),
+    linear-gradient(color-mix(in srgb,var(--mode-accent) 3%,transparent) 1px,transparent 1px),
+    linear-gradient(90deg,color-mix(in srgb,var(--mode-accent) 3%,transparent) 1px,transparent 1px)!important;
+  background-size:auto,40px 40px,40px 40px;
+}
+.market-app.cinematic-terminal:is(.theme-light,.theme-dark) .dashboard-workspace::before {
+  inset:0;
+  height:auto;
+  background:radial-gradient(ellipse at 78% 12%,color-mix(in srgb,var(--mode-accent) 13%,transparent),transparent 48%);
+  filter:blur(75px);
+  opacity:.75;
+}
+.market-app.cinematic-terminal:is(.theme-light,.theme-dark) .dashboard-workspace::after {
+  position:absolute;
+  inset:0;
+  background-image:
+    linear-gradient(color-mix(in srgb,var(--mode-accent) 3%,transparent) 1px,transparent 1px),
+    linear-gradient(90deg,color-mix(in srgb,var(--mode-accent) 3%,transparent) 1px,transparent 1px);
+  background-size:40px 40px;
+  animation:none;
+  opacity:.65;
+}
+.market-app:is(.theme-light,.theme-dark) :is(.dashboard-sidebar,.market-header) {
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+.market-app:is(.theme-light,.theme-dark):not(.cinematic-terminal) :is(
+  .panel,.overview-stat,.market-analysis-overview,.market-analysis-card,.settings-card,
+  .forex-analysis-panel,.market-instrument-picker,.strategy-panel,.smc-panel
+) {
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  box-shadow:var(--mode-shadow);
+}
+.market-app:is(.theme-light,.theme-dark) :is(.sidebar-link.selected,.terminal-nav a[aria-current="page"]) {
+  color:var(--mode-link);
+  background:var(--mode-active);
+  border-color:var(--mode-border);
+}
+.market-app.cinematic-terminal:is(.theme-light,.theme-dark) .td-kpi-main>strong {
+  background:linear-gradient(120deg,var(--mode-text),var(--mode-accent));
+  background-clip:text;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.market-app.cinematic-terminal:is(.theme-light,.theme-dark) :is(.glass-kpi-icon,.glass-icon) {
+  background:linear-gradient(145deg,#59d8f4,#247bc4);
+  box-shadow:inset 2px 3px 5px #ffffff55,inset -2px -4px 7px #164c8055,0 8px 18px #138dcc20;
+}
+.market-app.cinematic-terminal:is(.theme-light,.theme-dark) .td-kpi:nth-child(2) .glass-kpi-icon {
+  background:linear-gradient(145deg,#87e6f4,#349ac8);
+}
+.market-app.cinematic-terminal:is(.theme-light,.theme-dark) .td-kpi:nth-child(3) .glass-kpi-icon {
+  background:linear-gradient(145deg,#52dda8,#16875f);
+}
+.market-app.cinematic-terminal:is(.theme-light,.theme-dark) .td-kpi:nth-child(4) .glass-kpi-icon {
+  background:linear-gradient(145deg,#74aaff,#3169bd);
+}
+.market-app.cinematic-terminal.theme-dark .terminal-dashboard .td-green-text { color:#56dca7; }
+.market-app.cinematic-terminal.theme-dark .terminal-dashboard .td-red-text { color:#ff8995; }
+.market-app.cinematic-terminal.theme-light .terminal-dashboard .td-green-text { color:#087f57; }
+.market-app.cinematic-terminal.theme-light .terminal-dashboard .td-red-text { color:#b63848; }
+
+@property --dashboard-orbit-angle {
+  syntax:"<angle>";
+  inherits:false;
+  initial-value:0deg;
+}
+@keyframes dashboard-orbit {
+  to { --dashboard-orbit-angle:360deg; }
+}
+.market-app:is(.theme-light,.theme-dark) .dashboard-sidebar.workspace-sidebar {
+  isolation:isolate;
+}
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar>.market-brand {
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+}
+.market-app:is(.theme-light,.theme-dark) .dashboard-sidebar.workspace-sidebar::after,
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar>.market-brand::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:5;
+  box-sizing:border-box;
+  padding:2px;
+  border-radius:inherit;
+  pointer-events:none;
+  background:conic-gradient(
+    from var(--dashboard-orbit-angle),
+    transparent 0deg 296deg,
+    #45c7f43d 316deg,
+    #45c7f4 334deg,
+    #74e6d0 346deg,
+    transparent 360deg
+  );
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  mask-composite:exclude;
+  animation:dashboard-orbit 8s linear infinite;
+}
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar>.market-brand::after {
+  animation-duration:4.5s;
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .market-app.cinematic-terminal .dashboard-workspace::after,
+  .market-app:is(.theme-light,.theme-dark) .dashboard-sidebar.workspace-sidebar::after,
+  .market-app:is(.theme-light,.theme-dark) .workspace-sidebar>.market-brand::after {
+    animation:none;
+  }
+}

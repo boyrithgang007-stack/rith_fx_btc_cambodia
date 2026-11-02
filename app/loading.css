@@ -1,0 +1,96 @@
+.system-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, transparent calc(50% - .5px), #ffffff06 50%, transparent calc(50% + .5px)),
+    radial-gradient(ellipse at center, #121414 0, #090a0a 43%, #070808 100%);
+  color: #e4e6e5;
+}
+
+.system-loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateY(-2px);
+}
+
+.system-loading-orbit {
+  position: relative;
+  display: grid;
+  width: 96px;
+  height: 96px;
+  place-items: center;
+  border: 2px solid transparent;
+  border-right-color: #ffffff10;
+  border-bottom-color: #aeb4b366;
+  border-radius: 50%;
+  animation: system-loading-spin 1.8s linear infinite;
+}
+
+.system-loading-mark {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border: 1px solid #ffffff0d;
+  border-radius: 13px;
+  background: linear-gradient(145deg, #121515, #0d0f0f);
+  box-shadow: 0 0 22px #ffffff08, inset 0 1px #ffffff08;
+}
+
+.system-loading-mark svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: #8d9291;
+  stroke-linecap: round;
+  stroke-width: 1.7;
+}
+
+.system-loading-brand {
+  margin: 18px 0 0;
+  color: #a9adac;
+  font: 600 16px/1.2 Arial, sans-serif;
+  letter-spacing: .12em;
+}
+
+.system-loading-wave {
+  width: 104px;
+  height: 30px;
+  margin-top: 20px;
+  overflow: visible;
+  fill: none;
+  stroke: #777d7c;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+  animation: system-loading-pulse 1.4s ease-in-out infinite;
+}
+
+.system-loading-label {
+  position: absolute;
+  bottom: max(28px, env(safe-area-inset-bottom));
+  color: #555b5a;
+  font: 500 9px/1 Arial, sans-serif;
+  letter-spacing: .2em;
+}
+
+@keyframes system-loading-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes system-loading-pulse {
+  0%, 100% { opacity: .48; }
+  50% { opacity: .92; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .system-loading-orbit,
+  .system-loading-wave {
+    animation: none;
+  }
+}

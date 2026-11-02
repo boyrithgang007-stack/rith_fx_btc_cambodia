@@ -1,0 +1,90 @@
+/* Own sidebar presentation on every market view, independently of terminal styles. */
+.market-app:is(.theme-light,.theme-dark) .dashboard-sidebar.workspace-sidebar {
+  background:var(--mode-surface); border:1px solid var(--mode-border); border-radius:24px;
+  color:var(--mode-text); padding:24px 16px 18px;
+  box-shadow:0 8px 26px #00000006; text-shadow:none;
+}
+/* Light sidebar uses the supplied blue-gray material swatch. Tokens stay local. */
+.market-app.theme-light .dashboard-sidebar.workspace-sidebar {
+  --mode-surface:#A6B7C0;
+  --mode-inset:#BCCAD2;
+  --mode-text:#172832;
+  --mode-muted:#354A57;
+  --mode-border:#526D7D55;
+  --mode-active:#DDEDF9;
+  --mode-link:#0056A6;
+  --mode-accent:#0064C8;
+  background:repeating-linear-gradient(0deg,#ffffff05 0 1px,transparent 1px 3px),linear-gradient(155deg,#B1C0C8 0%,#A3B4BE 48%,#95A8B3 100%);
+  border-color:#839BA9;
+  box-shadow:inset 0 1px #ffffff70,0 8px 26px #263E5014;
+}
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .market-brand {
+  display:grid;grid-template-columns:minmax(0,1fr);gap:10px;padding:10px;margin:0 0 18px;
+  border:1px solid #6f879c66;border-radius:16px;
+  background:linear-gradient(145deg,#172535,#263b50 58%,#17283a);
+  box-shadow:inset 0 1px #e6f4ff20,0 8px 18px #172c4024;
+  transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease
+}
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .market-brand:hover {
+  border-color:#6bbcf299;box-shadow:inset 0 1px #e6f4ff30,0 0 18px #3199d82b;transform:translateY(-1px)
+}
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .market-brand-logo {
+  display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;
+  border:1px solid #9db4cc26;border-radius:10px;background:#17202d;
+  filter:drop-shadow(0 3px 8px #08111d70)
+}
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .market-brand-caption {display:grid;gap:2px;padding:0 2px}
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .market-brand strong { color:#edf5ff;font:700 14px/1.4 Arial,sans-serif; letter-spacing:.35px; }
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .market-brand small { color:#aabed2;font:600 7px/1.7 Arial,sans-serif; letter-spacing:.8px; margin:0; }
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .brand-symbol { background:var(--mode-text); color:var(--mode-bg); border:0; border-radius:12px; width:40px; height:40px; flex:none; box-shadow:none; font:700 12px Arial,sans-serif; }
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-label { color:var(--mode-muted); font:600 12px/2 Arial,"Noto Sans Khmer",sans-serif; margin:20px 12px 10px; }
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-nav { display:flex; flex-direction:column; gap:8px; scrollbar-width:thin; scrollbar-color:var(--mode-border) transparent; }
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-group { margin:4px 0; border:0; }
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-group>summary { display:flex; align-items:center; gap:8px; padding:12px; color:var(--mode-muted); font:600 12px/1.9 Arial,"Noto Sans Khmer",sans-serif; background:transparent; border:0; border-radius:12px; box-shadow:none; cursor:pointer; text-shadow:none; }
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-group>summary>i { margin-left:auto; border:0; border-radius:7px; background:var(--mode-inset); color:var(--mode-muted); font:500 10px/1.8 Arial,sans-serif; padding:1px 6px; box-shadow:none; }
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-group>summary>b { color:var(--mode-muted); font-size:13px; }
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-group-links { display:flex; flex-direction:column; gap:6px; padding:4px 0; }
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-link {
+  display:flex; align-items:center; gap:12px; min-height:48px; width:100%; padding:12px;
+  font:500 14px/1.9 Arial,"Noto Sans Khmer","Khmer OS Battambang",sans-serif;
+  color:var(--mode-text); -webkit-text-fill-color:currentColor; opacity:1; text-shadow:none;
+  background:transparent; border:1px solid transparent; border-radius:14px; box-shadow:none;
+  white-space:normal; text-decoration:none; transform:none; filter:none;
+  transition:background .16s ease,border-color .16s ease;
+}
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-link>.sidebar-icon { flex:0 0 20px; color:var(--mode-muted); opacity:1; }
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-link.selected { background:var(--mode-active); color:var(--mode-link); border-color:var(--mode-border); box-shadow:inset 3px 0 var(--mode-accent); font-weight:700; }
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-link.selected>.sidebar-icon { color:var(--mode-link); }
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-bottom { margin-top:14px; padding-top:16px; border-top:1px solid var(--mode-border); }
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-profile { padding:12px; gap:10px; border:1px solid var(--mode-border); border-radius:16px; background:var(--mode-inset); box-shadow:none; }
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-profile-copy strong { color:var(--mode-text); font-size:13px; line-height:1.8; }
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-profile-copy small { color:var(--mode-muted); font-size:11px; line-height:1.8; }
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-profile-arrow { color:var(--mode-link); }
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-live { color:var(--mode-muted); padding:14px 10px 0; font-size:12px; line-height:1.9; }
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-live small { color:var(--mode-muted); font-size:10px; }
+@media(hover:hover) {
+  .market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-link:hover { color:var(--mode-text); background:var(--mode-inset); border-color:var(--mode-border); box-shadow:none; transform:none; }
+  .market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-link.selected:hover { color:var(--mode-link); background:var(--mode-active); box-shadow:inset 3px 0 var(--mode-accent); }
+}
+.market-app:is(.theme-light,.theme-dark) .workspace-sidebar :is(a,summary):focus-visible { outline:2px solid var(--mode-accent); outline-offset:2px; }
+@media(min-width:761px) {
+  .market-app:is(.theme-light,.theme-dark) { display:grid; grid-template-columns:220px minmax(0,1fr); }
+  .market-app:is(.theme-light,.theme-dark) .dashboard-sidebar.workspace-sidebar {
+    display:flex; flex-direction:column; grid-column:1; grid-row:1;
+    min-height:0; min-width:0; overflow:hidden;
+  }
+  .market-app:is(.theme-light,.theme-dark)>.dashboard-workspace {
+    grid-column:2; grid-row:1; width:100%; min-width:0;
+  }
+}
+@media(min-width:1100px) { .market-app:is(.theme-light,.theme-dark) { grid-template-columns:250px minmax(0,1fr); } }
+@media(max-width:760px) {
+  .market-app:is(.theme-light,.theme-dark) .dashboard-sidebar.workspace-sidebar { padding:12px; border-radius:18px; }
+  .market-app:is(.theme-light,.theme-dark) .workspace-sidebar .market-brand {grid-template-columns:104px minmax(0,1fr);align-items:center;gap:10px;padding:8px;margin-bottom:8px}
+  .market-app:is(.theme-light,.theme-dark) .workspace-sidebar .market-brand-logo {width:104px}
+  .market-app:is(.theme-light,.theme-dark) .workspace-sidebar .market-brand strong {font-size:12px}
+  .market-app:is(.theme-light,.theme-dark) .workspace-sidebar .market-brand small {font-size:6px;letter-spacing:.55px}
+  .market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-nav { flex-direction:row; align-items:flex-start; gap:8px; }
+  .market-app:is(.theme-light,.theme-dark) .workspace-sidebar .sidebar-link { width:auto; min-width:max-content; }
+}
+@media(prefers-reduced-motion:reduce) { .workspace-sidebar .sidebar-link { transition:none; } }

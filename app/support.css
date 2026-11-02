@@ -1,0 +1,55 @@
+.support-button {
+  display:inline-flex; min-height:36px; align-items:center; justify-content:center;
+  padding:0 12px; border:1px solid var(--mode-border,#4b7093); border-radius:10px;
+  background:var(--mode-surface,#102847); color:var(--mode-text,#e8f6ff);
+  font:600 11px/1.3 Arial,"Noto Sans Khmer",sans-serif; text-decoration:none;
+  white-space:nowrap; transition:background .18s ease,transform .18s ease;
+}
+.support-button:hover { background:var(--mode-active,#1b3d63); transform:translateY(-1px); }
+.support-button:focus-visible { outline:2px solid var(--mode-accent,#3ba7f2); outline-offset:2px; }
+.support-page {
+  display:grid; min-height:100vh; place-items:center; padding:24px;
+  background:
+    radial-gradient(ellipse at 12% 18%,#a88bea20,transparent 36%),
+    radial-gradient(ellipse at 84% 78%,#72bed420,transparent 38%),
+    var(--mode-bg,#eaf0ff);
+  color:var(--mode-text,#182640);
+  font-family:Arial,"Noto Sans Khmer","Khmer OS Battambang",sans-serif;
+}
+.support-card {
+  width:min(100%,680px); padding:clamp(22px,5vw,42px); border:1px solid var(--mode-border,#ffffffcc);
+  border-radius:22px; background:var(--mode-surface,#ffffffb3); box-shadow:var(--mode-shadow,0 16px 36px #3647a522);
+}
+.support-back { color:var(--mode-link,#5132b8); font-size:12px; text-decoration:none; }
+.support-eyebrow { margin:28px 0 8px; color:var(--mode-accent,#7c3aed); font:700 10px/1.5 ui-monospace,monospace; letter-spacing:1.2px; }
+.support-card h1 { margin:0; font-size:clamp(25px,5vw,36px); }
+.support-card>p:not(.support-eyebrow) { color:var(--mode-muted,#52627e); line-height:1.8; }
+.support-card form { display:grid; gap:18px; margin-top:26px; }
+.support-card form label { display:grid; gap:8px; font-size:12px; font-weight:600; }
+.support-card input,.support-card textarea {
+  width:100%; min-height:46px; padding:12px 14px; border:1px solid var(--mode-border,#c8d1e4);
+  border-radius:11px; background:var(--mode-inset,#ffffff80); color:var(--mode-text,#182640);
+  font:400 14px/1.7 Arial,"Noto Sans Khmer",sans-serif;
+}
+.support-card input[readonly] { opacity:.78; }
+.support-card textarea { min-height:150px; resize:vertical; }
+.support-card input:focus-visible,.support-card textarea:focus-visible { outline:2px solid var(--mode-accent,#7c3aed); outline-offset:2px; }
+.support-form-footer { display:flex; align-items:center; justify-content:space-between; gap:14px; }
+.support-form-footer>span { color:var(--mode-muted,#52627e); font:11px/1 ui-monospace,monospace; }
+.support-status,.support-error { margin:18px 0 0; padding:12px 14px; border-radius:10px; font-size:12px; line-height:1.7; }
+.support-status { color:#087856; background:#10b98118; }
+.support-error { color:#b42336; background:#ef444418; }
+.theme-scope.theme-dark .support-page {
+  background:
+    radial-gradient(ellipse at 12% 18%,#8c5cf630,transparent 36%),
+    radial-gradient(ellipse at 84% 78%,#24c5e528,transparent 38%),
+    var(--mode-bg,#071a36);
+}
+.theme-scope.theme-dark .support-status { color:#71f1dc; }
+.theme-scope.theme-dark .support-error { color:#ff9da7; }
+@media(max-width:480px) {
+  .support-page { padding:14px; }
+  .support-card { border-radius:16px; }
+  .support-form-footer { align-items:stretch; flex-direction:column; }
+  .support-form-footer button { width:100%; }
+}

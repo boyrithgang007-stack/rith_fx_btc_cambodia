@@ -1,0 +1,80 @@
+import { getCurrentUser, allowAuthAttempt } from "@/app/lib/auth";
+import { authJson, isSameOriginRequest, readAuthJson } from "@/app/lib/auth-http";
+import { BinanceFuturesTestnet, EaExchangeError } from "@/app/lib/ea/binance-futures";
+import {
+  getEaSettings,
+  hasEaCredentials,
+  isEaTestnetVerified,
+  listEaAuditEvents,
+  listEaRuns,
+  markEaTestnetVerified,
+  parseEaCredentials,
+  parseEaSettings,
+  removeEaCredentials,
+  saveEaSettings,
+} from "@/app/lib/ea/store";
+import { assertVaultConfigured, VaultConfigurationError } from "@/app/lib/exchanges/vault";
+
+export const runtime = "nodejs";
+
+function encryptionConfigured() {
+  return /^[a-fA-F0-9]{64}$/.test(process.env.EXCHANGE_ENCRYPTION_KEY ?? "");
+}
+
+export async function GET() {
+  const user = await getCurrentUser();
+  if (!user) return authJson("សូមចូលគណនីដែលបានអនុម័តជាមុន។", 401);
+  return Response.json({
+    settings: getEaSettings(user.id),
+    encryptionConfigured: encryptionConfigured(),
+    credentialsConfigured: hasEaCredentials(user.id),
+    testnetVerified: isEaTestnetVerified(user.id),
+    runs: listEaRuns(user.id),
+    audit: listEaAuditEvents(user.id),
+  }, { headers: { "Cache-Control": "no-store" } });
+}
+
+export async function POST(request: Request) {
+  if (!isSameOriginRequest(request)) return authJson("Request origin rejected.", 403);
+  const user = await getCurrentUser();
+  if (!user) return authJson("សូមចូលគណនីដែលបានអនុម័តជាមុន។", 401);
+  if (!allowAuthAttempt(`ea-settings:${user.id}`, 5, 60000)) return authJson("ព្យាយាមច្រើនដងពេក។ សូមរង់ចាំមួយនាទី។", 429);
+
+  const body = await readAuthJson(request);
+  const settings = parseEaSettings(body?.settings);
+  if (!settings) return authJson("ការកំណត់ EA មិនត្រឹមត្រូវទេ។", 400);
+  const credentials = body?.credentials === undefined ? undefined : parseEaCredentials(body.credentials);
+  if (body?.credentials !== undefined && !credentials) return authJson("Binance Futures Testnet API key ឬ secret មិនត្រឹមត្រូវទេ។", 400);
+
+  try {
+    assertVaultConfigured();
+    if (credentials) {
+      saveEaSettings(user.id, { ...settings, enabled: false }, credentials);
+      await new BinanceFuturesTestnet(credentials).verifyAccount();
+      markEaTestnetVerified(user.id);
+    } else if (settings.enabled && (!hasEaCredentials(user.id) || !isEaTestnetVerified(user.id))) {
+      return authJson("សូមភ្ជាប់ និងផ្ទៀងផ្ទាត់ Binance Futures Testnet មុនបើក EA។", 409);
+    }
+    return Response.json({
+      settings: saveEaSettings(user.id, settings),
+      encryptionConfigured: encryptionConfigured(),
+      credentialsConfigured: hasEaCredentials(user.id),
+      testnetVerified: isEaTestnetVerified(user.id),
+      runs: listEaRuns(user.id),
+      audit: listEaAuditEvents(user.id),
+    }, { headers: { "Cache-Control": "no-store" } });
+  } catch (error) {
+    if (error instanceof VaultConfigurationError) return authJson("Server មិនទាន់កំណត់ encryption សម្រាប់ EA credentials ទេ។", 503);
+    if (error instanceof EaExchangeError) return authJson(error.message, 502);
+    return authJson("មិនអាចរក្សាទុក ឬផ្ទៀងផ្ទាត់ការកំណត់ EA បានទេ។", 500);
+  }
+}
+
+export async function DELETE(request: Request) {
+  if (!isSameOriginRequest(request)) return authJson("Request origin rejected.", 403);
+  const user = await getCurrentUser();
+  if (!user) return authJson("សូមចូលគណនីដែលបានអនុម័តជាមុន។", 401);
+  if (!allowAuthAttempt(`ea-disconnect:${user.id}`, 5, 60000)) return authJson("ព្យាយាមច្រើនដងពេក។ សូមរង់ចាំមួយនាទី។", 429);
+  removeEaCredentials(user.id);
+  return Response.json({ disconnected: true }, { headers: { "Cache-Control": "no-store" } });
+}

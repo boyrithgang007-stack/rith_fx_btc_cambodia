@@ -1,0 +1,52 @@
+.welcome-page :is(.welcome-team-card,.welcome-member-proof,.welcome-project,.welcome-news-card,.welcome-final)::after,
+.market-app:is(.theme-light,.theme-dark) :is(.panel,.settings-card,.market-analysis-card,.forex-analysis-panel,.market-instrument-picker,.strategy-panel,.smc-panel,.connection-card,.bank-payment-card,.account-hub-grid>a,.smc-summary article,.backtest-grid>div,.signal-levels>div,.forex-converter,.strategy-signal):not(.market-analysis-overview):not(.overview-stat)::after,
+.theme-scope:is(.theme-light,.theme-dark) :is(.connection-card,.connections-balance,.account-hub-grid>a,.bank-payment-card)::after,
+.connections-page :is(.connection-card,.connections-balance,.account-hub-grid>a,.bank-payment-card,.connection-safety,.account-connect-form)::after,
+.admin-members-page .admin-members-panel::after {
+  content:"";
+  position:absolute;
+  z-index:3;
+  inset:-2px;
+  padding:2px;
+  border-radius:inherit;
+  background:conic-gradient(from var(--card-neon-angle,0deg),transparent 0deg 255deg,#50f0d7 285deg,#67aaff 315deg,#d9a1ff 340deg,transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  filter:drop-shadow(0 0 4px #63e9ef88);
+  animation:card-neon-orbit 5s linear infinite;
+  pointer-events:none;
+}
+
+.welcome-page :is(.welcome-team-card,.welcome-member-proof,.welcome-project,.welcome-news-card,.welcome-final),
+.market-app:is(.theme-light,.theme-dark) :is(.panel,.settings-card,.market-analysis-card,.forex-analysis-panel,.market-instrument-picker,.strategy-panel,.smc-panel,.connection-card,.bank-payment-card,.account-hub-grid>a,.smc-summary article,.backtest-grid>div,.signal-levels>div,.forex-converter,.strategy-signal):not(.market-analysis-overview):not(.overview-stat),
+.theme-scope:is(.theme-light,.theme-dark) :is(.connection-card,.connections-balance,.account-hub-grid>a,.bank-payment-card),
+.connections-page :is(.connection-card,.connections-balance,.account-hub-grid>a,.bank-payment-card,.connection-safety,.account-connect-form),
+.admin-members-page .admin-members-panel {
+  position:relative;
+  isolation:isolate;
+}
+
+.welcome-page .welcome-final::after {
+  inset:-2px;
+}
+
+@property --card-neon-angle {
+  syntax:"<angle>";
+  inherits:false;
+  initial-value:0deg;
+}
+
+@keyframes card-neon-orbit {
+  to { --card-neon-angle:360deg; }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .welcome-page :is(.welcome-team-card,.welcome-member-proof,.welcome-project,.welcome-news-card,.welcome-final)::after,
+  .market-app:is(.theme-light,.theme-dark) :is(.panel,.settings-card,.market-analysis-card,.forex-analysis-panel,.market-instrument-picker,.strategy-panel,.smc-panel,.connection-card,.bank-payment-card,.account-hub-grid>a,.smc-summary article,.backtest-grid>div,.signal-levels>div,.forex-converter,.strategy-signal)::after,
+  .theme-scope:is(.theme-light,.theme-dark) :is(.connection-card,.connections-balance,.account-hub-grid>a,.bank-payment-card)::after,
+  .connections-page :is(.connection-card,.connections-balance,.account-hub-grid>a,.bank-payment-card,.connection-safety,.account-connect-form)::after,
+  .admin-members-page .admin-members-panel::after {
+    animation:none;
+  }
+}

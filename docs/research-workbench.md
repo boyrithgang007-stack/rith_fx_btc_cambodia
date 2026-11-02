@@ -1,0 +1,13 @@
+# Market research workbench
+
+Location: `/markets/analysis`. Choose an instrument and press **ចាប់ផ្ដើមវិភាគ**. A run requests the existing protected market, price-history, commodity, Forex and macro routes and public news route in parallel. Each request has a 25-second client timeout; providers retain their existing server caches. Source failures are shown independently. No credentials, account balances or trading operations are used.
+
+Coverage is explicitly limited: Bitcoin/Ethereum history, supported gold/silver/WTI/Brent futures references, seven Forex reference pairs, the tracked CoinGecko market sample, BLS US CPI calendar, Forex Factory current-week export and Bloomberg economics RSS. The component never claims all worldwide data or all news publishers. CPI schedules are not CPI Actual readings. Missing Actual remains unavailable.
+
+The chart contains historical observations only. It has no projected price path. The latest observation must be within 36 hours for crypto, 96 hours for commodities or seven days for daily Forex reference rates. At least 12 positive, finite, strictly increasing observations are required. Future and malformed observations fail closed with no directional percentages. Up to 400 recent observations are retained.
+
+The displayed percentage is a heuristic **historical evidence index**, not a forecast probability or win rate. Trend weight = 50: last-five mean versus up-to-last-twenty mean, scaled by 2%. Momentum weight = 30: return across the last five observation intervals, scaled by 5%. Each signed input is clamped to [-1,1]. Crypto alone can include tracked breadth with weight 20; missing/unchanged observations are excluded and timestamps must be valid within 36 hours. Missing breadth is omitted, with the remaining weights normalized. Up = round(50 + 50 * weighted mean); down = 100 - up. Flat measured evidence is 50/50; missing history is not.
+
+CPI and news are presented as sourced context beside the index. They do **not** receive a fabricated directional impact or sentiment score. Estimating the probability of a particular instrument rising after a news release would require timestamped release surprises, matched subsequent returns, a defined prediction horizon, adequate historical samples, out-of-sample calibration and monitoring. This implementation does not claim that capability.
+
+Validation covers rejected missing/stale/future/malformed histories, up/down/flat cases, missing breadth handling and scale invariance. Four added model tests bring the suite to 66 passing tests. Build and lint are checked separately; four existing image optimization warnings remain. No authenticated visual interaction is certified by these checks.

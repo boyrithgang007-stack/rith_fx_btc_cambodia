@@ -1,0 +1,135 @@
+.admin-members-content{padding-top:48px}
+.admin-members-panel{margin-top:24px;padding:22px;border:1px solid #292a32;border-radius:14px;background:#121319}
+.admin-members-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.admin-members-toolbar h2{margin:0;font-size:17px}
+.admin-refresh,.admin-member-filters button{min-height:34px;padding:0 12px;border:1px solid #34343f;border-radius:7px;background:#191a21;color:#c4c1ce;font-size:10px}
+.admin-refresh:hover,.admin-member-filters button:hover{border-color:#8a72d0;color:#e3d9ff}
+.admin-refresh:disabled{opacity:.6;cursor:wait}
+.admin-member-filters{display:flex;flex-wrap:wrap;gap:7px;margin:18px 0}
+.admin-member-filters button[aria-pressed=true]{border-color:#8a72d0;background:#292239;color:#e3d9ff}
+.admin-members-content button:focus-visible{outline:2px solid #bca6ff;outline-offset:2px}
+.admin-feedback,.admin-empty{padding:12px;border-radius:8px;font-size:11px;line-height:1.7}
+.admin-feedback.success{border:1px solid #315e4b;background:#14241d;color:#a8e1c0}
+.admin-feedback.error{border:1px solid #67363c;background:#2a171b;color:#ffb6ba}
+.admin-empty{margin:0;color:#aaa8b5}
+.admin-member-table-wrap{overflow-x:auto;border:1px solid #2a2b33;border-radius:9px}
+.admin-member-table{width:100%;border-collapse:collapse;text-align:left}
+.admin-member-table th,.admin-member-table td{padding:12px 13px;border-bottom:1px solid #292a32;vertical-align:middle}
+.admin-member-table th{color:#8e8c98;font-size:9px;font-weight:600;letter-spacing:.5px;white-space:nowrap}
+.admin-member-table td{color:#c6c3ce;font-size:10px}
+.admin-member-table td code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:10px;white-space:nowrap}
+.admin-member-table tbody tr:last-child td{border-bottom:0}
+.admin-member-table td:first-child strong,.admin-member-table td:first-child span{display:block}
+.admin-member-table td:first-child strong{color:#f1f0f5;font-size:11px}
+.admin-member-table td:first-child span{margin-top:4px;color:#96949f}
+.admin-status{display:inline-flex;padding:5px 8px;border:1px solid #3c3a45;border-radius:20px;font-size:9px;white-space:nowrap}
+.admin-status.enabled{border-color:#326148;background:#17251c;color:#a8e1c0}
+.admin-status.pending{border-color:#65562e;background:#282315;color:#e5cd8c}
+.admin-status.disabled{border-color:#633b40;background:#29191c;color:#f0aeb3}
+.admin-member-actions{display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:135px}
+.admin-member-actions button{min-height:30px;padding:0 9px;border:1px solid #45404f;border-radius:6px;background:#201e27;color:#d4d0dd;font-size:9px}
+.admin-member-actions button.approve{border-color:#396447;background:#17271e;color:#b5e7c7}
+.admin-member-actions button.reject{border-color:#684148;background:#291b1e;color:#f0b2b7}
+.admin-member-actions button:disabled{opacity:.55;cursor:wait}
+.admin-action-pending{color:#c0b3e4;font-size:9px}
+.admin-member-count{margin:10px 0 0;color:#85838e;font-size:9px}
+.admin-audit-list{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.admin-audit-list li{display:grid;grid-template-columns:150px minmax(0,1fr) 165px;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #292a32;color:#aaa8b5;font-size:10px}
+.admin-audit-list li:last-child{border-bottom:0}
+.admin-audit-action{color:#d3c7f5}
+.admin-audit-list strong{color:#efedf4;font-weight:500}
+.admin-audit-list time{color:#85838e;font-size:9px;text-align:right}
+@media(max-width:700px){.admin-members-content{padding-top:32px}.admin-members-panel{padding:15px}.admin-members-toolbar{align-items:flex-start}.admin-member-table{min-width:920px}.admin-audit-list li{grid-template-columns:1fr;gap:5px}.admin-audit-list time{text-align:left}}
+
+.theme-scope.theme-light .admin-members-page{
+  min-height:100vh;
+  background:radial-gradient(ellipse at 92% 0%,#dceafe 0,transparent 34%),linear-gradient(145deg,#f7f9fc,#eef2f8);
+  color:#182338;
+}
+.theme-scope.theme-light .admin-members-page .connections-header{
+  border:1px solid #e1e7f0;
+  border-radius:14px;
+  background:#ffffffd9;
+  box-shadow:0 4px 16px #263b5910;
+}
+.theme-scope.theme-light .admin-members-page .connections-brand,
+.theme-scope.theme-light .admin-members-page .connections-back{color:#24334a}
+.theme-scope.theme-light .admin-members-page .connections-brand>span{
+  border:0;
+  border-radius:9px;
+  background:linear-gradient(145deg,#385e9d,#234477);
+  box-shadow:none;
+  color:#fff;
+  text-shadow:none;
+}
+.theme-scope.theme-light .admin-members-page .connections-theme-toggle{
+  min-height:36px!important;
+  padding:0 12px!important;
+  border:1px solid #d6deea!important;
+  border-radius:9px!important;
+  background:#fff!important;
+  box-shadow:none!important;
+  color:#34435b!important;
+}
+.theme-scope.theme-light .admin-members-page .connections-intro h1{color:#17243a}
+.theme-scope.theme-light .admin-members-page .connections-eyebrow{color:#526f9d}
+.theme-scope.theme-light .admin-members-page .connections-intro>p:last-child{color:#5d6b80}
+.theme-scope.theme-light .admin-members-page .admin-members-panel{
+  border-color:#e0e6ef;
+  background:#fff;
+  box-shadow:0 8px 26px #263b590d;
+}
+.theme-scope.theme-light .admin-members-page .admin-members-toolbar h2{color:#1d2b41}
+.theme-scope.theme-light .admin-members-page .admin-refresh,
+.theme-scope.theme-light .admin-members-page .admin-member-filters button{
+  min-height:36px!important;
+  border:1px solid #d7dfeb!important;
+  border-radius:8px!important;
+  background:#fff!important;
+  box-shadow:none!important;
+  color:#43536c!important;
+}
+.theme-scope.theme-light .admin-members-page .admin-refresh:hover,
+.theme-scope.theme-light .admin-members-page .admin-member-filters button:hover{
+  border-color:#9bb2d3!important;
+  background:#f7f9fc!important;
+  color:#274b7e!important;
+}
+.theme-scope.theme-light .admin-members-page .admin-member-filters button[aria-pressed=true]{
+  border-color:#9cb7dc!important;
+  background:#edf4ff!important;
+  color:#244d82!important;
+}
+.theme-scope.theme-light .admin-members-page .admin-member-table-wrap{border-color:#e1e7ef}
+.theme-scope.theme-light .admin-members-page .admin-member-table th{
+  border-color:#e6ebf2;
+  background:#f7f9fc;
+  color:#627087;
+}
+.theme-scope.theme-light .admin-members-page .admin-member-table td{
+  border-color:#e8edf3;
+  color:#3e4c61;
+}
+.theme-scope.theme-light .admin-members-page .admin-member-table tbody tr:hover{background:#f8faff}
+.theme-scope.theme-light .admin-members-page .admin-member-table td:first-child strong{color:#1c2b42}
+.theme-scope.theme-light .admin-members-page .admin-member-table td:first-child span{color:#66758b}
+.theme-scope.theme-light .admin-members-page .admin-member-table td code{color:#46566f}
+.theme-scope.theme-light .admin-members-page .admin-status.enabled{border-color:#b9dfc9;background:#edf8f1;color:#267348}
+.theme-scope.theme-light .admin-members-page .admin-status.pending{border-color:#ead9a6;background:#fff9e8;color:#856315}
+.theme-scope.theme-light .admin-members-page .admin-status.disabled{border-color:#efc4c6;background:#fff1f1;color:#a33d43}
+.theme-scope.theme-light .admin-members-page .admin-member-actions button{
+  min-height:32px!important;
+  border-radius:7px!important;
+  box-shadow:none!important;
+}
+.theme-scope.theme-light .admin-members-page .admin-member-actions button.approve{border-color:#b8dfc8!important;background:#edf8f1!important;color:#267348!important}
+.theme-scope.theme-light .admin-members-page .admin-member-actions button.reject{border-color:#efc4c6!important;background:#fff1f1!important;color:#a33d43!important}
+.theme-scope.theme-light .admin-members-page .admin-feedback.success{border-color:#b9dfc9;background:#edf8f1;color:#267348}
+.theme-scope.theme-light .admin-members-page .admin-feedback.error{border-color:#efc4c6;background:#fff1f1;color:#a33d43}
+.theme-scope.theme-light .admin-members-page .admin-empty,
+.theme-scope.theme-light .admin-members-page .admin-member-count{color:#66758b}
+.theme-scope.theme-light .admin-members-page .admin-audit-list li{border-color:#e6ebf2;color:#596980}
+.theme-scope.theme-light .admin-members-page .admin-audit-action{color:#395d91}
+.theme-scope.theme-light .admin-members-page .admin-audit-list strong{color:#25364f}
+.theme-scope.theme-light .admin-members-page .admin-audit-list time{color:#77859a}
+.theme-scope.theme-light .admin-members-page button:focus-visible{outline-color:#4778b8}

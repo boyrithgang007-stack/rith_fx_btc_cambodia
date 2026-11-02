@@ -1,0 +1,19 @@
+.ff-calendar { margin:22px 0; padding:24px; background:var(--mode-surface); color:var(--mode-text); border:1px solid var(--mode-border); border-radius:8px; box-shadow:var(--mode-shadow); min-width:0; }
+.ff-heading { display:flex; flex-wrap:wrap; gap:15px; align-items:center; justify-content:space-between; }
+.ff-heading h3 { margin:8px 0; font-size:22px; line-height:1.8; }.ff-heading p,.ff-status,.ff-note { color:var(--mode-muted); font-size:12px; line-height:1.9; }
+.ff-calendar a { color:var(--mode-accent); font-size:12px; text-underline-offset:4px; }
+.ff-controls { display:flex; flex-wrap:wrap; gap:14px; align-items:end; margin:20px 0 14px; }
+.ff-controls label { display:grid; gap:6px; min-width:120px; font-size:12px; color:var(--mode-muted); }
+.ff-controls select { min-height:40px; padding:8px 12px; }.ff-controls button { padding:9px 14px; }
+.ff-calendar .table-scroll { width:100%; overflow-x:auto; overscroll-behavior-x:contain; border:1px solid var(--mode-border); border-radius:6px; margin-top:15px; }
+.ff-table { width:100%; min-width:760px; border-collapse:collapse; font-size:12px; }
+.ff-table caption { padding:12px; text-align:left; color:var(--mode-muted); font-size:11px; }
+.ff-table th { background:var(--mode-inset); color:var(--mode-muted); font-size:11px; font-weight:600; }
+.ff-table :is(th,td) { padding:13px 12px; border-bottom:1px solid var(--mode-border); text-align:left; height:auto; line-height:1.8; }
+.ff-table td { color:var(--mode-text); }.ff-table td:nth-child(3) { min-width:190px; }
+.ff-impact { display:inline-flex; padding:3px 7px; font-size:10px; border:1px solid var(--mode-border); border-radius:4px; background:var(--mode-inset); }
+.ff-impact.impact-high { color:#cf5263; border-color:#cf526355; }.ff-impact.impact-medium { color:#9c7932; border-color:#ad8d4e66; }
+.theme-dark .ff-impact.impact-medium { color:#e6ca83; }.theme-dark .ff-impact.impact-high { color:#ff8993; }
+.ff-status { padding:10px 12px; background:var(--mode-inset); border-radius:5px; }
+.ff-note { margin:14px 0 0; }
+@media(max-width:600px) { .ff-calendar { padding:16px; }.ff-controls label { flex:1 1 120px; }.ff-controls select { font-size:16px; }.ff-heading h3 { font-size:19px; } }

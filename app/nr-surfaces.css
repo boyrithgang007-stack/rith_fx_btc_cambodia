@@ -1,0 +1,215 @@
+/* NR standard mode: shared materials across every application surface. */
+:is(.market-app, .auth-screen, .theme-scope).theme-light, .membership-review {
+  --nr-metal: repeating-linear-gradient(0deg, #ffffff0a 0 1px, transparent 1px 3px), linear-gradient(145deg, #d5dfe5, #9cabb5 52%, #c4d0d8);
+  --nr-carbon-surface: repeating-linear-gradient(135deg, #ffffff04 0 2px, #0000000c 2px 4px), linear-gradient(145deg, #35434d, #17232c);
+  --nr-walnut: repeating-linear-gradient(92deg, #ffffff07 0 1px, transparent 1px 5px), linear-gradient(110deg, #38271e, #72503a 46%, #402d23);
+  --nr-card-shadow: inset 0 1px #ffffffb3, inset 0 -2px #45586370, 0 8px 18px #02080d66;
+  --nr-frame: #7e95a5;
+  --nr-focus: #9bd7ff;
+}
+.market-app.theme-light, .auth-screen.theme-light,
+.theme-scope.theme-light .connections-page, .membership-review {
+  background: url('/brand/nr-circuit.svg') repeat, radial-gradient(ellipse at 15% 0%, #39749c40, transparent 50%), linear-gradient(135deg, #303c45, #16212a 65%, #293640);
+}
+.market-app.theme-light .dashboard-workspace { min-width: 0; }
+.market-app.theme-light :is(.panel, .market-analysis-overview, .market-analysis-card, .settings-card, .forex-analysis-panel, .market-instrument-picker) {
+  border: 1px solid var(--nr-frame);
+  border-radius: 12px;
+  background: var(--nr-metal);
+  box-shadow: var(--nr-card-shadow);
+  color: #172a37;
+}
+.market-app.theme-light :is(.panel-heading, .assets-heading, .settings-card-heading, .forex-heading, .backtest-heading) {
+  border-bottom-color: #657d8d70;
+}
+.market-app.theme-light :is(.overview-stat, .smc-summary article) {
+  background: var(--nr-walnut);
+  border: 1px solid #9b8b7b;
+  box-shadow: inset 0 1px #ffffff40, inset 0 0 0 3px #1b273570, 0 6px 14px #02080d70;
+  border-radius: 10px;
+  color: #f1eee9;
+}
+.market-app.theme-light .overview-stat :is(span, strong, small),
+.market-app.theme-light .smc-summary :is(span, strong, small) { color: #f1eee9; }
+.market-app.theme-light .overview-stat::after { background: var(--nr-metal); }
+.market-app.theme-light :is(.analysis-link, .analysis-periods > span, .analysis-direction, .settings-secondary-button, .settings-text-button, .favorite-toggle) {
+  border: 1px solid #718998;
+  background: var(--nr-metal);
+  box-shadow: inset 0 1px #ffffffb0, 0 3px 7px #16263230;
+  color: #203c50;
+}
+.market-app.theme-light .analysis-periods b { color: #172a37; }
+.market-app.theme-light :is(.market-analysis-overview)::before,
+.market-app.theme-light :is(.market-analysis-overview)::after { display: none; }
+.market-app.theme-light :is(.smc-chart.smc-chart-dark, .chart-signal-status, .chart-signal-detail, .smc-equity) {
+  background: var(--nr-carbon-surface);
+  border: 1px solid #7895a9;
+  border-radius: 10px;
+  box-shadow: inset 0 1px #ffffff30, 0 5px 12px #050c1240;
+  color: #dce9f1;
+}
+.market-app.theme-light .smc-equity { padding: 16px; }
+.market-app.theme-light .smc-chart-dark svg { background: #17232c; }
+.market-app.theme-light .smc-chart-dark :is(.smc-toolbar, .smc-ohlc),
+.market-app.theme-light .chart-signal-status strong { color: #dce9f1; }
+.market-app.theme-light :is(.smc-toolbar select, .smc-controls input, .smc-cost input, .strategy-controls select, .strategy-controls input) {
+  background: linear-gradient(180deg, #e8f0f5, #bbcbd5);
+  border: 1px solid #6c8595;
+  color: #172a37;
+  color-scheme: light;
+}
+.market-app.theme-light .smc-chart-dark .smc-toolbar select {
+  background: #273b49;
+  color: #e8f0f5;
+  color-scheme: dark;
+}
+.market-app.theme-light :is(.smc-checks, .smc-rules, .smc-data-note, .smc-quality, .forex-disclaimer, .fx-source-note, .fx-conversion-result) { color: #304c60; }
+.market-app.theme-light .smc-chart .smc-data-note { color: #bfd2df; }
+.market-app.theme-light :is(.chart-signal-detail button, .backtest-heading button, .smc-toolbar button, .settings-primary-button, .refresh-button, .alert-button) {
+  border: 1px solid #4b86b0;
+  background: linear-gradient(145deg, #d1e9fa, #7aafd2 50%, #3c739b);
+  box-shadow: inset 0 1px #ffffffbd, 0 3px 0 #243f52, 0 6px 12px #13293640;
+  color: #102f45;
+}
+.market-app.theme-light :is(.chart-empty, .table-empty, .empty-state, .error-banner, .loading-state) {
+  border: 1px solid #7895a9;
+  border-radius: 10px;
+  background: #d8e3eb;
+  color: #203b4e;
+}
+.market-app.theme-light :is(.text-positive, .analysis-periods b.text-positive) { color: #126444; }
+.market-app.theme-light :is(.text-negative, .analysis-periods b.text-negative) { color: #9e302d; }
+.market-app.theme-light .macro-observatory { background: var(--nr-carbon-surface); border-radius: 14px; }
+.market-app.theme-light .macro-hero {
+  background: url('/brand/nr-circuit.svg') repeat, var(--nr-carbon-surface);
+  border-bottom: 1px solid #6d90a8;
+}
+.market-app.theme-light :is(.macro-card, .macro-float) {
+  background: var(--nr-carbon-surface);
+  border: 1px solid #7d99ae;
+  border-radius: 11px;
+  box-shadow: inset 0 1px #ffffff40, 0 8px 16px #050c1280;
+}
+.market-app.theme-light :is(.macro-language-switch, .macro-prompts button, .macro-actions a + a) {
+  background: var(--nr-metal);
+  color: #18374d;
+  border: 1px solid #829cab;
+}
+.market-app.theme-light .macro-prompts button { color: #18374d; }
+.market-app.theme-light .macro-status { color: #cadce7; }
+.auth-screen.theme-light :is(.home-experience, .desktop-journey, .desktop-stage, .cinematic-hero) {
+  background: url('/brand/nr-circuit.svg') repeat, var(--nr-carbon-surface);
+}
+.auth-screen.theme-light :is(.home-nav, .spatial-header) {
+  background: #17232ced;
+  border-bottom: 1px solid #7895a9;
+  box-shadow: 0 4px 14px #02080d70;
+}
+.auth-screen.theme-light :is(.home-feature-card, .home-feature-card.feature-violet, .home-feature-card.feature-blue, .spatial-card) {
+  background: var(--nr-carbon-surface);
+  border: 2px solid #8b9eab;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 2px #142432, inset 0 0 0 3px #b8d7eb50, 0 12px 24px #02080d80;
+}
+.auth-screen.theme-light .home-feature-card .feature-art {
+  background: var(--nr-walnut);
+  border: 1px solid #9f8c79;
+  border-radius: 12px;
+}
+.auth-screen.theme-light :is(.home-feature-card small, .home-hero-copy h1 em, .spatial-intro h1 em, .home-feature-intro h2 span) { color: #9dd4ff; }
+.auth-screen.theme-light .home-particles { filter: hue-rotate(325deg) saturate(.65); }
+.auth-screen.theme-light .auth-form-panel { background: url('/brand/nr-circuit.svg') repeat, var(--nr-carbon-surface); }
+.auth-screen.theme-light .auth-form-wrap {
+  background: var(--nr-metal);
+  border: 2px solid #8ca2b1;
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 2px #20303c, inset 0 0 0 4px #d2e3ef80, 0 16px 32px #02080d80;
+}
+.auth-screen.theme-light .auth-password-field > small { color: #3b5364; }
+.theme-scope.theme-light .connections-header { background: var(--nr-metal); }
+.theme-scope.theme-light :is(.account-hub-grid a, .connection-card, .bank-connection-note, .connections-balance) {
+  background: var(--nr-metal);
+  border: 1px solid #91a6b4;
+  border-radius: 12px;
+  box-shadow: var(--nr-card-shadow);
+  color: #172a37;
+}
+.theme-scope.theme-light :is(.connection-safety, .account-section-nav) {
+  background: var(--nr-walnut);
+  border: 1px solid #927b64;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: inset 0 1px #ffffff30, 0 6px 16px #02080d60;
+}
+.theme-scope.theme-light :is(.connection-card button, .bank-connection-note button):disabled { opacity: .65; cursor: not-allowed; }
+.membership-review section { background: var(--nr-metal); box-shadow: var(--nr-card-shadow); border: 2px solid #8ca2b1; }
+.membership-review section::before {
+  content: ''; display: block; width: 76px; height: 76px; margin-bottom: 20px;
+  background: url('/brand/nr-innovations.svg') center / contain no-repeat;
+}
+.membership-review button { background: var(--nr-carbon-surface); color: #e0edf5; border: 1px solid #819daf; }
+:is(.market-app, .auth-screen, .theme-scope).theme-light :is(button, input, select, textarea) { accent-color: #286a9c; }
+:is(.market-app, .auth-screen, .theme-scope).theme-light :is(a, button, input, select, textarea, summary):focus-visible,
+.membership-review :is(a, button):focus-visible { outline: 2px solid #55a9ff; outline-offset: 3px; }
+@media (max-width: 760px) {
+  .market-app.theme-light .dashboard-sidebar { border-radius: 12px; }
+  .market-app.theme-light :is(.panel, .settings-card, .market-analysis-overview) { border-radius: 10px; }
+  .theme-light :is(.dock-pill, .dock-shortcuts) { background: var(--nr-metal); border: 2px solid #89a5b8; }
+  .theme-light .dock-shortcuts { max-height: min(65dvh, 540px); overflow-y: auto; overscroll-behavior: contain; }
+  .theme-light .dock-pill > a[aria-current] { background: var(--nr-carbon-surface); color: #b9e2ff; }
+  .theme-light .floating-dock .dock-add { background: var(--nr-carbon-surface); color: #b9e2ff; border: 2px solid #86b6d5; }
+  .auth-screen.theme-light .auth-form-wrap { border-radius: 12px; }
+  .theme-scope.theme-light .account-section-nav { padding: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-light :is(button, a) { transition: none; }
+}
+
+/* Feedback, market placeholders and nested strategy labels. */
+.market-app.theme-light .signal-levels div span { color: #b9cfdf; }
+.market-app.theme-light .signal-levels div strong { color: #eef5fa; }
+.market-app.theme-light :is(.backtest-grid div span, .backtest-disclaimer) { color: #354f62; }
+.market-app.theme-light .settings-feedback {
+  border: 1px solid #6087a3;
+  background: #d5e6f1;
+  color: #183e59;
+  border-radius: 8px;
+}
+.market-app.theme-light .empty-results { color: #36566c; }
+.market-app.theme-light .error-banner { border-color: #ba8170; background: #efdad2; color: #702e24; }
+.market-app.theme-light .error-banner button { color: #702e24; }
+.market-app.theme-light .skeleton-row span {
+  background-image: linear-gradient(90deg, #8da1ae, #dce7ee, #8da1ae);
+}
+.market-app.theme-light .chart-skeleton span { background: repeating-linear-gradient(90deg, #6f8ba0 0 4px, transparent 4px 8px); }
+.auth-screen.theme-light :is(.spatial-gallery, .spatial-portal, .spatial-controls) { background-color: #17232c; }
+.auth-screen.theme-light .spatial-controls { border-color: #7895a980; }
+.auth-screen.theme-light .spatial-card-art { filter: hue-rotate(325deg) saturate(.5); }
+.auth-screen.theme-light .home-hero-bottom button { border-color: #7c98ac; color: #d3e6f3; background: #243947; }
+@media (forced-colors: active) {
+  :is(.market-app, .auth-screen, .theme-scope).theme-light :is(a, button, input, select, textarea, summary):focus-visible { outline-color: Highlight; }
+  :is(.market-app, .auth-screen).theme-light :is(.brand-symbol, .home-logo-mark, .spatial-brand-mark),
+  .theme-scope.theme-light .connections-brand > span { background: Canvas; color: CanvasText; }
+}
+
+.connected-accounts { display: grid; gap: 20px; margin: 24px 0; }
+.account-connect-form { max-width: 720px; }
+.account-connect-form h2 { margin: 8px 0 14px; }
+.account-connect-form fieldset { border: 0; padding: 0; margin: 20px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.account-connect-form label { display: grid; gap: 8px; font-size: 13px; }
+.account-connect-form :is(input, select) { width: 100%; min-width: 0; padding: 12px; border: 1px solid #718998; border-radius: 8px; background: #e0eaf0; color: #172a37; }
+.account-connect-form button { align-self: end; min-height: 44px; }
+.connection-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0; }
+.connection-balances { width: 100%; border-collapse: collapse; font-size: 12px; }
+.connection-balances :is(th, td) { padding: 10px 8px; border-bottom: 1px solid #71899870; text-align: right; }
+.connection-balances :is(th, td):first-child { text-align: left; }
+.connection-summary { display: grid; gap: 8px; }
+.connection-summary > div { display: flex; justify-content: space-between; gap: 12px; }
+.connection-summary dd { margin: 0; font-variant-numeric: tabular-nums; }
+.connection-observed { font-size: 11px; }
+.theme-dark .account-connect-form :is(input, select) { background: #142139; color: #e2eefb; border-color: #405477; }
+.theme-dark .connected-accounts .connection-card { color: #e2eefb; }
+@media(max-width: 600px) { .account-connect-form fieldset { grid-template-columns: 1fr; } }
+
+.bank-payment-qr { display: block; width: min(100%, 280px); height: auto; margin: 16px auto; border: 8px solid white; border-radius: 8px; }
+.payment-reference { overflow-wrap: anywhere; font-family: monospace; }
