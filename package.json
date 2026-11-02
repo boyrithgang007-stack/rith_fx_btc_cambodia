@@ -16,12 +16,12 @@
     "db:backup:sqlite-legacy": "node scripts/backup-sqlite-legacy.mjs"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.2.0",
     "bcryptjs": "^3.0.3",
     "ffmpeg-static": "^5.2.0",
     "jose": "^6.2.12",
     "next": "^16.3.8",
     "nodemailer": "^10.0.13",
+    "pg": "^8.23.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "sharp": "0.35.5"
@@ -31,6 +31,7 @@
     "@types/better-sqlite3": "^9.6.0",
     "@types/node": "^20",
     "@types/nodemailer": "^8.0.2",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "better-sqlite3": "^13.0.3",

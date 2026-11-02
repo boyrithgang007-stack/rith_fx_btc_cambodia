@@ -6,7 +6,7 @@ Registration already creates pending members and sends a private review link to 
 
 Run `node scripts/setup-private-config.mjs` from Edikiter. This preserves configured keys, reuses the development session secret when available, and creates missing authentication, vault and MT5 bridge secrets without printing them. It was run during this implementation. Keep `.env.local` private and back it up separately from the database. Losing the encryption key makes stored exchange credentials unreadable. Rotation currently requires disconnecting and reconnecting accounts; automatic key migration is not implemented.
 
-For public deployment, configure APP_BASE_URL to the real HTTPS origin, keep AUTH_SECRET stable, set DATABASE_URL to a pooled Neon PostgreSQL connection string, and add a shared rate limiter or WAF. The included limiter is process-local. Vercel serverless does not run the continuous EA worker or support the 250 MB dubbing workflow; use separate worker/object-storage infrastructure for those features.
+For public deployment, configure APP_BASE_URL to the real HTTPS origin, keep AUTH_SECRET stable, set DATABASE_URL to a Supabase transaction-pooler URI, and add a shared rate limiter or WAF. The included limiter is process-local. Vercel serverless does not run the continuous EA worker or support the 250 MB dubbing workflow; use separate worker/object-storage infrastructure for those features.
 
 ## Exchange accounts
 

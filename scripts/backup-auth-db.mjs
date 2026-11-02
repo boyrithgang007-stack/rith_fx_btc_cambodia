@@ -7,8 +7,8 @@ import { pipeline } from "node:stream/promises";
 import nextEnv from "@next/env";
 
 nextEnv.loadEnvConfig(process.cwd());
-const connectionString = process.env.DATABASE_URL_UNPOOLED?.trim() || process.env.DATABASE_URL?.trim();
-if (!connectionString) throw new Error("DATABASE_URL or DATABASE_URL_UNPOOLED is required to back up PostgreSQL.");
+const connectionString = process.env.DATABASE_URL_DIRECT?.trim() || process.env.DATABASE_URL?.trim();
+if (!connectionString) throw new Error("DATABASE_URL or DATABASE_URL_DIRECT is required to back up PostgreSQL.");
 const directory = path.resolve(process.argv[2] || "./backups");
 await mkdir(directory, { recursive: true });
 const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");

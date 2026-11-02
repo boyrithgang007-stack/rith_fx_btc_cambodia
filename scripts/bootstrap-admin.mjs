@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { Pool } from "@neondatabase/serverless";
+import { Pool } from "pg";
 import nextEnv from "@next/env";
 
 nextEnv.loadEnvConfig(process.cwd());
@@ -8,7 +8,7 @@ if (process.argv.length !== 3 || !email || email.length > 254 || !/^[^\s@]+@[^\s
   console.error("Usage: npm run admin:bootstrap -- <registered-email>");
   process.exitCode = 1;
 } else if (!process.env.DATABASE_URL) {
-  console.error("DATABASE_URL is required. Add the Neon connection string to .env.local or the deployment environment.");
+  console.error("DATABASE_URL is required. Add the Supabase pooler connection string to .env.local or the deployment environment.");
   process.exitCode = 1;
 } else {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 1 });

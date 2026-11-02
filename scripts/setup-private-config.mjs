@@ -15,4 +15,4 @@ add('EXCHANGE_ENCRYPTION_KEY', crypto.randomBytes(32).toString('hex'));
 add('MT5_BRIDGE_TOKEN', crypto.randomBytes(32).toString('hex'));
 add('MT5_BRIDGE_URL', 'http://127.0.0.1:8787');
 fs.writeFileSync(file, content, { mode: 0o600 });
-console.log('Private configuration prepared. Set DATABASE_URL to a Neon PostgreSQL pooled connection string before starting the app. Existing keys were preserved; secret values are never printed.');
+console.log('Private configuration prepared. Set DATABASE_URL to a Supabase transaction-pooler URI before starting the app. Existing keys were preserved; secret values are never printed.');

@@ -1,4 +1,4 @@
-import { Pool, type PoolClient, type QueryResultRow } from "@neondatabase/serverless";
+import { Pool, type PoolClient, type QueryResultRow } from "pg";
 
 type Queryable = Pool | PoolClient;
 type DbRow = QueryResultRow & Record<string, unknown>;
@@ -99,22 +99,23 @@ const schemaStatements = [
 ] as const;
 
 declare global {
-  var __rfxNeonPool: Pool | undefined;
-  var __rfxNeonSchemaReady: Promise<void> | undefined;
+  var __rfxDatabasePool: Pool | undefined;
+  var __rfxDatabaseSchemaReady: Promise<void> | undefined;
 }
 
 function getPool() {
   const connectionString = process.env.DATABASE_URL?.trim();
-  if (!connectionString) throw new Error("DATABASE_URL is required. Add a Neon PostgreSQL connection string to the deployment environment.");
-  if (!globalThis.__rfxNeonPool) {
-    globalThis.__rfxNeonPool = new Pool({
+  if (!connectionString) throw new Error("DATABASE_URL is required. Add a Supabase PostgreSQL connection string to the deployment environment.");
+  if (!globalThis.__rfxDatabasePool) {
+    globalThis.__rfxDatabasePool = new Pool({
       connectionString,
-      max: 5,
+      ssl: { rejectUnauthorized: true },
+      max: 1,
       idleTimeoutMillis: 10_000,
       connectionTimeoutMillis: 10_000,
     });
   }
-  return globalThis.__rfxNeonPool;
+  return globalThis.__rfxDatabasePool;
 }
 
 function quoteCamelAliases(sql: string) {
@@ -127,8 +128,8 @@ function postgresSql(sql: string) {
 }
 
 async function ensureSchema() {
-  if (!globalThis.__rfxNeonSchemaReady) {
-    globalThis.__rfxNeonSchemaReady = (async () => {
+  if (!globalThis.__rfxDatabaseSchemaReady) {
+    globalThis.__rfxDatabaseSchemaReady = (async () => {
       const pool = getPool();
       const client = await pool.connect();
       try {
@@ -142,11 +143,11 @@ async function ensureSchema() {
         client.release();
       }
     })().catch(error => {
-      globalThis.__rfxNeonSchemaReady = undefined;
+      globalThis.__rfxDatabaseSchemaReady = undefined;
       throw error;
     });
   }
-  await globalThis.__rfxNeonSchemaReady;
+  await globalThis.__rfxDatabaseSchemaReady;
 }
 
 export async function query<Row extends DbRow = DbRow>(sql: string, values: readonly unknown[] = [], client?: Queryable) {
@@ -185,8 +186,8 @@ export async function checkDatabase() {
 }
 
 export async function closeDatabasePool() {
-  const pool = globalThis.__rfxNeonPool;
-  globalThis.__rfxNeonPool = undefined;
-  globalThis.__rfxNeonSchemaReady = undefined;
+  const pool = globalThis.__rfxDatabasePool;
+  globalThis.__rfxDatabasePool = undefined;
+  globalThis.__rfxDatabaseSchemaReady = undefined;
   await pool?.end();
 }

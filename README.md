@@ -5,7 +5,7 @@ A Next.js market dashboard with Crypto, Forex reference rates, an FVG paper stra
 ## Run locally
 
 1. Install Node.js 22 or newer.
-2. Create a PostgreSQL database in Neon, copy its pooled connection string to `DATABASE_URL` in `.env.local`, and generate a private authentication secret:
+2. Create a Supabase project, choose **Transaction pooler** under Connect, copy its URI into `DATABASE_URL` in `.env.local`, and generate a private authentication secret:
 	```sh
 	node -e "console.log(require('node:crypto').randomBytes(32).toString('base64url'))"
 	```
@@ -25,10 +25,10 @@ The analysis area includes a disabled-by-default Binance Futures Testnet EA, plu
 
 ## Member administration
 
-The first administrator must be bootstrapped from a trusted shell connected to the same Neon database as the app:
+The first administrator must be bootstrapped from a trusted shell connected to the same Supabase database as the app:
 
 1. Register the administrator's email through the app and complete email verification. Do not share the password or server credentials.
-2. From this project directory, set `DATABASE_URL` to that database's pooled connection string, then run `npm run admin:bootstrap -- admin@example.com`.
+2. From this project directory, set `DATABASE_URL` to that database's transaction-pooler URI, then run `npm run admin:bootstrap -- admin@example.com`.
 3. Sign in with that account and open **គ្រប់គ្រងសមាជិក** from the dashboard sidebar, or visit `/admin/members`.
 
 The bootstrap command only works while no administrator exists. It approves and enables the matching registered account and grants its admin role; it cannot be used to add more admins. Keep server-shell access restricted. Admins can approve or reject pending registrations and disable or re-enable approved member access. Disabled accounts lose access on their next request, including requests using an existing session. Management actions are recorded in the admin audit log.
@@ -37,18 +37,18 @@ The member list records a new account's registration IP and updates its last-log
 
 Back up the database before production deployment and verify the bootstrap command's environment points at the production database, not a local development copy. `npm run db:backup -- ./backups` requires the PostgreSQL `pg_dump` utility; restore backups only into a verified target database.
 
-## Free-tier Vercel + Neon deployment
+## Free-tier Vercel + Supabase deployment
 
-1. Create a Neon PostgreSQL project and a Vercel project connected to this GitHub repository. Use the repository root as the Vercel project root; it contains `package.json`.
-2. In Vercel project settings, add `DATABASE_URL` using Neon's pooled connection string, `AUTH_SECRET` (at least 32 bytes), and `EXCHANGE_ENCRYPTION_KEY` (64 hex characters). Add `APP_BASE_URL` as the deployed HTTPS origin plus the email provider variables (`RESEND_API_KEY`, verified `APPROVAL_EMAIL_FROM`, and `APPROVAL_ADMIN_EMAIL`). Add market/AI/payment variables only for services you have configured. Never put secrets in `NEXT_PUBLIC_` variables or chat.
-3. Deploy, open `/api/health`, and confirm it returns `{"status":"ok"}`. Register and verify the first admin email, then run the bootstrap command from a trusted local shell with `DATABASE_URL` set to the same Neon project.
-4. Sign in, review the member/admin controls, and test registration/approval and email delivery. Keep an offsite database backup and review Neon/Vercel usage limits before inviting members. A fresh Neon database starts empty; the previous local SQLite accounts and data are not migrated automatically.
+1. Create a Supabase project and a Vercel project connected to this GitHub repository. Use the repository root as the Vercel project root; it contains `package.json`.
+2. In Supabase, choose **Connect → Transaction pooler** and copy its connection URI. In Vercel project settings, add that value as `DATABASE_URL`, plus `AUTH_SECRET` (at least 32 bytes) and `EXCHANGE_ENCRYPTION_KEY` (64 hex characters). Add `APP_BASE_URL` as the deployed HTTPS origin plus the email provider variables (`RESEND_API_KEY`, verified `APPROVAL_EMAIL_FROM`, and `APPROVAL_ADMIN_EMAIL`). Add market/AI/payment variables only for services you have configured. Never put secrets in `NEXT_PUBLIC_` variables or chat.
+3. Deploy, open `/api/health`, and confirm it returns `{"status":"ok"}`. Register and verify the first admin email, then run the bootstrap command from a trusted local shell with `DATABASE_URL` set to the same Supabase project.
+4. Sign in, review the member/admin controls, and test registration/approval and email delivery. Keep an offsite database backup and review Supabase/Vercel usage limits before inviting members. A fresh database starts empty; the previous local SQLite accounts and data are not migrated automatically.
 
 Vercel's serverless functions do not run the app's long-lived polling worker: automatic EA operation is intentionally unavailable there and the API refuses to enable it. Binance Futures remains Testnet-only. Forex signals require a secured, reachable HTTPS MT5 bridge; `127.0.0.1` inside Vercel is not the user's/local bridge. Vercel's request-size and execution limits also do not support the 250 MB dubbing workflow; use a separate VM/background worker and object storage for that feature.
 
 ## Docker / single-VM deployment
 
-The supplied `compose.yaml` can still run one Next.js container and Caddy, but the app now requires external PostgreSQL. Provide `DATABASE_URL` and the same required secrets in `.env.production`; the old SQLite volume is not used. Configure DNS, HTTPS, and firewall rules as described for your VM provider. Run `npm run admin:bootstrap -- <registered-email>` in a trusted environment connected to the production database. For backups, use a recent PostgreSQL client and Neon’s unpooled URL (`DATABASE_URL_UNPOOLED`); store dumps offsite and test restores.
+The supplied `compose.yaml` can still run one Next.js container and Caddy, but the app now requires external PostgreSQL. Provide `DATABASE_URL` and the same required secrets in `.env.production`; the old SQLite volume is not used. Configure DNS, HTTPS, and firewall rules as described for your VM provider. Run `npm run admin:bootstrap -- <registered-email>` in a trusted environment connected to the production database. For backups, use a recent PostgreSQL client and a Supabase direct/session-pooler URI as `DATABASE_URL_DIRECT`; store dumps offsite and test restores.
 
 The in-memory rate limiter is process-local; use a shared rate limiter/WAF for a multi-instance public deployment. ABA payments remain in sandbox until the bank authorizes live credentials and a production transaction test.
 
