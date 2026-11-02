@@ -14,14 +14,14 @@ export async function POST(request: Request) {
   if (!email || typeof password !== "string" || password.length > 72) return authJson("អ៊ីមែល ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវទេ។", 401);
 
   try {
-    const user = getUserByEmail(email);
+    const user = await getUserByEmail(email);
     const validPassword = await verifyPassword(password, user?.password_hash);
     if (!user || !validPassword) return authJson("អ៊ីមែល ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវទេ។", 401);
     if (user.email_verified !== 1) return authJson("សូមផ្ទៀងផ្ទាត់អ៊ីមែលរបស់អ្នកតាមតំណដែលបានផ្ញើ មុនចូលគណនី។", 403);
     if (user.access_enabled !== 1) return authJson("ការចូលប្រើគណនីនេះត្រូវបានបិទ។ សូមទាក់ទងអ្នកគ្រប់គ្រង។", 403);
     if (user.status !== "approved") return authJson(user.status === "pending" ? "គណនីរបស់អ្នកកំពុងរង់ចាំអ្នកគ្រប់គ្រងអនុម័ត។" : "សំណើសមាជិករបស់អ្នកមិនត្រូវបានអនុម័តទេ។", 403);
     await createSession({ id: user.id, email: user.email });
-    recordSuccessfulLogin(user.id, getClientIp(request));
+    await recordSuccessfulLogin(user.id, getClientIp(request));
     return Response.json({ user: { id: user.id, email: user.email } }, { headers: { "Cache-Control": "no-store" } });
   } catch {
     return authJson("មិនអាចចូលគណនីបានទេ។ សូមសាកល្បងម្ដងទៀត។", 503);

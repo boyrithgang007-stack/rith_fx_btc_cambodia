@@ -53,15 +53,15 @@ async function closeAfterProtectionFailure(
     const remainsOpen = account.positions.some(position => position.symbol === symbol && Math.abs(position.positionAmt) > 1e-12);
     return { closed: !remainsOpen, protectionCancelled: stopCancelled && takeProfitCancelled };
   } catch {
-    disableEa(userId, "ea.halted.emergency_close_failed");
+    await disableEa(userId, "ea.halted.emergency_close_failed");
     return { closed: false, protectionCancelled: stopCancelled && takeProfitCancelled };
   }
 }
 
 async function processUser(userId: string, symbol: EaSymbol, settings: EaSettings) {
-  const credentials = getEaCredentials(userId);
+  const credentials = await getEaCredentials(userId);
   if (!credentials) {
-    disableEa(userId, "ea.halted.credentials_missing");
+    await disableEa(userId, "ea.halted.credentials_missing");
     return;
   }
   const client = new BinanceFuturesTestnet(credentials);
@@ -70,14 +70,14 @@ async function processUser(userId: string, symbol: EaSymbol, settings: EaSetting
     account = await client.verifyAccount();
   } catch (error) {
     if (error instanceof EaExchangeError && error.message.includes("one-way position mode")) {
-      disableEa(userId, "ea.halted.position_mode");
+      await disableEa(userId, "ea.halted.position_mode");
       console.error("[ea-worker] EA stopped: Binance Futures position mode changed.");
       return;
     }
     throw error;
   }
   if (account.positions.some(position => position.positionAmt !== 0 && position.positionSide !== "BOTH")) {
-    disableEa(userId, "ea.halted.position_mode");
+    await disableEa(userId, "ea.halted.position_mode");
     console.error("[ea-worker] EA stopped: Binance Futures position mode changed.");
     return;
   }
@@ -87,12 +87,12 @@ async function processUser(userId: string, symbol: EaSymbol, settings: EaSetting
   const dailyPnl = realizedPnl + account.totalUnrealizedProfit;
   const startOfDayEquity = equity - dailyPnl;
   if (!Number.isFinite(startOfDayEquity) || startOfDayEquity <= 0) {
-    disableEa(userId, "ea.halted.daily_equity_invalid");
+    await disableEa(userId, "ea.halted.daily_equity_invalid");
     console.error("[ea-worker] EA stopped: daily starting equity could not be verified.");
     return;
   }
   if (dailyPnl <= -(startOfDayEquity * 0.03)) {
-    disableEa(userId, "ea.halted.daily_loss_limit");
+    await disableEa(userId, "ea.halted.daily_loss_limit");
     console.error("[ea-worker] EA stopped: daily loss limit reached.");
     return;
   }
@@ -100,7 +100,7 @@ async function processUser(userId: string, symbol: EaSymbol, settings: EaSetting
   const candles = await client.getCandles(symbol);
   if (!hasContinuousCandles(candles, BASE_INTERVAL) || candles.length < 20) return;
   const candleTime = candles.at(-1)!.time;
-  if (Date.now() - candleTime > BASE_INTERVAL + 15 * 60_000 || hasEaRun(userId, symbol, candleTime)) return;
+  if (Date.now() - candleTime > BASE_INTERVAL + 15 * 60_000 || await hasEaRun(userId, symbol, candleTime)) return;
   const higher = aggregateCandles(candles, BASE_INTERVAL, HIGHER_INTERVAL);
   const signal = evaluateConfirmedSignal(candles, settings.capitalUsd, settings.riskPercent, 2, {
     candles: higher,
@@ -109,13 +109,13 @@ async function processUser(userId: string, symbol: EaSymbol, settings: EaSetting
   }, 10);
   if (signal.action === "WAIT") return;
 
-  const runId = claimEaRun(userId, symbol, candleTime);
+  const runId = await claimEaRun(userId, symbol, candleTime);
   if (!runId) return;
   try {
     const [markPrice, rules] = await Promise.all([client.getMarkPrice(symbol), client.getSymbolRules(symbol)]);
     const decision = decideEaOrder({ signal, settings, account, baselineEquity: startOfDayEquity, markPrice, rules });
     if (!decision.allowed) {
-      updateEaRun(runId, "skipped", decision.reason);
+      await updateEaRun(runId, "skipped", decision.reason);
       return;
     }
 
@@ -128,8 +128,8 @@ async function processUser(userId: string, symbol: EaSymbol, settings: EaSetting
       try {
         entry = await client.findOrder(symbol, entryId);
       } catch {
-        disableEa(userId, "ea.halted.order_status_unknown");
-        updateEaRun(runId, "halted", "មិនអាចបញ្ជាក់ស្ថានភាព entry order បានទេ។ EA ត្រូវបានបិទដើម្បីការពារ order ស្ទួន។");
+        await disableEa(userId, "ea.halted.order_status_unknown");
+        await updateEaRun(runId, "halted", "មិនអាចបញ្ជាក់ស្ថានភាព entry order បានទេ។ EA ត្រូវបានបិទដើម្បីការពារ order ស្ទួន។");
         return;
       }
     }
@@ -138,10 +138,10 @@ async function processUser(userId: string, symbol: EaSymbol, settings: EaSetting
     if (!Number.isFinite(executedQuantity) || executedQuantity <= 0) {
       try {
         await client.cancelOrder(symbol, entryId);
-        updateEaRun(runId, "failed", "Binance មិនបានបំពេញ entry order ហើយ order ត្រូវបានលុប។", String(entry.orderId));
+        await updateEaRun(runId, "failed", "Binance មិនបានបំពេញ entry order ហើយ order ត្រូវបានលុប។", String(entry.orderId));
       } catch {
-        disableEa(userId, "ea.halted.entry_order_cancel_failed");
-        updateEaRun(runId, "halted", "Entry order មិនបានបញ្ជាក់ថាបានបំពេញ ឬលុបទេ។ សូមពិនិត្យ Testnet ភ្លាមៗ។", String(entry.orderId));
+        await disableEa(userId, "ea.halted.entry_order_cancel_failed");
+        await updateEaRun(runId, "halted", "Entry order មិនបានបញ្ជាក់ថាបានបំពេញ ឬលុបទេ។ សូមពិនិត្យ Testnet ភ្លាមៗ។", String(entry.orderId));
       }
       return;
     }
@@ -155,16 +155,16 @@ async function processUser(userId: string, symbol: EaSymbol, settings: EaSetting
     const takeProfitId = clientOrderId(userId, symbol, candleTime, "T");
     if (!Number.isFinite(actualEntry) || actualEntry <= 0 || stopDistance <= 0 || takeProfit <= 0 || (isLong ? decision.stopLoss >= actualEntry : decision.stopLoss <= actualEntry)) {
       const closed = await closeAfterProtectionFailure(client, userId, symbol, stopSide, executedQuantity, stopId, takeProfitId, clientOrderId(userId, symbol, candleTime, "X"));
-      disableEa(userId, "ea.halted.invalid_protection_levels");
-      updateEaRun(runId, "halted", closed.closed ? "Fill price ប្រែប្រួល។ Position ត្រូវបានបិទ និង EA ត្រូវបានបិទ។" : "Fill price ប្រែប្រួល ហើយការបិទ position មិនទាន់បញ្ជាក់បានទេ។ សូមពិនិត្យ Testnet ភ្លាមៗ។", String(entry.orderId));
+      await disableEa(userId, "ea.halted.invalid_protection_levels");
+      await updateEaRun(runId, "halted", closed.closed ? "Fill price ប្រែប្រួល។ Position ត្រូវបានបិទ និង EA ត្រូវបានបិទ។" : "Fill price ប្រែប្រួល ហើយការបិទ position មិនទាន់បញ្ជាក់បានទេ។ សូមពិនិត្យ Testnet ភ្លាមៗ។", String(entry.orderId));
       return;
     }
 
     const actualRisk = executedQuantity * (stopDistance + (actualEntry + decision.stopLoss) * 0.001);
     if (actualRisk > settings.capitalUsd * settings.riskPercent / 100 + 1e-8) {
       const closed = await closeAfterProtectionFailure(client, userId, symbol, stopSide, executedQuantity, stopId, takeProfitId, clientOrderId(userId, symbol, candleTime, "X"));
-      disableEa(userId, "ea.halted.risk_overrun");
-      updateEaRun(runId, "halted", closed.closed ? "Fill price ធ្វើឲ risk លើសកម្រិត។ Position ត្រូវបានបិទ ហើយ EA ត្រូវបានបិទ។" : "Fill price ធ្វើឲ risk លើសកម្រិត ហើយការបិទ position មិនទាន់បញ្ជាក់បានទេ។ សូមពិនិត្យ Testnet ភ្លាមៗ។", String(entry.orderId));
+      await disableEa(userId, "ea.halted.risk_overrun");
+      await updateEaRun(runId, "halted", closed.closed ? "Fill price ធ្វើឲ risk លើសកម្រិត។ Position ត្រូវបានបិទ ហើយ EA ត្រូវបានបិទ។" : "Fill price ធ្វើឲ risk លើសកម្រិត ហើយការបិទ position មិនទាន់បញ្ជាក់បានទេ។ សូមពិនិត្យ Testnet ភ្លាមៗ។", String(entry.orderId));
       return;
     }
 
@@ -178,8 +178,8 @@ async function processUser(userId: string, symbol: EaSymbol, settings: EaSetting
       const closed = await closeAfterProtectionFailure(
         client, userId, symbol, stopSide, executedQuantity, stopId, takeProfitId, clientOrderId(userId, symbol, candleTime, "X"),
       );
-      disableEa(userId, "ea.halted.protection_order_failure");
-      updateEaRun(
+      await disableEa(userId, "ea.halted.protection_order_failure");
+      await updateEaRun(
         runId,
         "halted",
         closed.closed && closed.protectionCancelled
@@ -191,15 +191,15 @@ async function processUser(userId: string, symbol: EaSymbol, settings: EaSetting
       );
       return;
     }
-    updateEaRun(runId, "opened", `${signal.action} បានដាក់លើ Testnet ជាមួយ SL និង TP 1:2។`, String(entry.orderId));
+    await updateEaRun(runId, "opened", `${signal.action} បានដាក់លើ Testnet ជាមួយ SL និង TP 1:2។`, String(entry.orderId));
   } catch (error) {
-    updateEaRun(runId, "failed", safeMessage(error));
+    await updateEaRun(runId, "failed", safeMessage(error));
     console.error("[ea-worker] Testnet execution failed:", error instanceof Error ? error.message : "Unknown error");
   }
 }
 
 export async function runEaPass() {
-  const enabledUsers = listEnabledEaUsers();
+  const enabledUsers = await listEnabledEaUsers();
   for (const user of enabledUsers) {
     try {
       await processUser(user.userId, user.symbol, {
@@ -221,7 +221,7 @@ declare global {
 }
 
 export function startEaWorker() {
-  if (process.env.NODE_ENV === "test" || globalThis.__rfxEaWorker) return;
+  if (process.env.NODE_ENV === "test" || process.env.VERCEL === "1" || globalThis.__rfxEaWorker) return;
   const tick = () => { void runEaPass().catch(error => console.error("[ea-worker] EA pass failed:", error instanceof Error ? error.message : "Unknown error")); };
   globalThis.__rfxEaWorker = setInterval(tick, POLL_INTERVAL);
   globalThis.__rfxEaWorker.unref();

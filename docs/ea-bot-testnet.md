@@ -14,7 +14,7 @@ The application verifies the Testnet account and one-way mode before enabling au
 
 ## Execution and risk limits
 
-- The worker runs in the long-lived Node.js application process; the SQLite deployment must remain a single application instance.
+- On a long-lived Node.js deployment the worker polls every 30 seconds. Vercel serverless does not run that worker; the API refuses to enable automatic EA polling there. Use a separately secured worker service if automation is required.
 - It evaluates completed 4-hour Binance Futures candles using the existing FVG/order-block strategy and a complete 1-day higher-timeframe confirmation. It checks every 30 seconds and processes a signal only once per symbol and candle.
 - Entry sizing uses the configured capital and risk, reserves an estimated 20 bps for trading costs, respects Binance quantity/notional filters and available margin, and never exceeds 5x leverage.
 - Each entry uses a market order followed by verified close-position stop-loss and take-profit triggers at 1:2 reward/risk. Ambiguous order states, excess risk, missing protection, or daily limits halt the EA; if protection cannot be verified, inspect the Testnet account manually.

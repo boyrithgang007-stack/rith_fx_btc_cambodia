@@ -4,26 +4,23 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import * as jose from 'jose';
 import ts from 'typescript';
+import { createDatabase, databaseAdapter } from './helpers/database-adapter.mjs';
 const require = createRequire(import.meta.url);
-const Database = require('better-sqlite3');
 function load(file,dependencies={}) {
   const loaded={exports:{}};
   const source=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,esModuleInterop:true}}).outputText;
   new Function('exports','module','require','fetch',source)(loaded.exports,loaded,name=>name in dependencies ? dependencies[name] : require(name),dependencies.__fetch ?? globalThis.fetch);
   return loaded.exports;
 }
-const membership=load('app/lib/membership.ts');
-const db=new Database(':memory:');
-db.pragma('foreign_keys = ON');
-db.exec("CREATE TABLE users (id TEXT PRIMARY KEY,email TEXT UNIQUE,password_hash TEXT,created_at TEXT); INSERT INTO users VALUES ('legacy','legacy@example.com','hash',NULL)");
-membership.initializeMembership(db);
-const adminMembers=load('app/lib/admin-members.ts');
-adminMembers.initializeAdminMembers(db);
-const socialLinks=load('app/lib/public-social-links.ts');
-socialLinks.initializePublicSocialLinks(db);
+const db=createDatabase();
+const database=databaseAdapter(db);
+db.exec("INSERT INTO users (id,email,password_hash,status) VALUES ('legacy','legacy@example.com','hash','approved')");
+const membership=load('app/lib/membership.ts',{'./database':database});
+const adminMembers=load('app/lib/admin-members.ts',{'./database':database});
+const socialLinks=load('app/lib/public-social-links.ts',{'./database':database});
 const cookieJar=new Map();
 const auth=load('app/lib/auth.ts',{
-  './membership':membership,'./admin-members':adminMembers,'./public-social-links':socialLinks,'better-sqlite3':function(){return db;},'node:fs':{mkdirSync(){}},jose,
+  './membership':membership,'./database':database,jose,
   'next/headers':{cookies:async()=>({get:key=>cookieJar.has(key) ? {value:cookieJar.get(key)} : undefined,set:(key,value)=>cookieJar.set(key,value),delete:key=>cookieJar.delete(key)})},
 });
 const http=load('app/lib/auth-http.ts');
@@ -44,32 +41,30 @@ const req=(body,origin='http://localhost',ip)=>new Request('http://localhost/api
 const password='Test-passphrase-123!';
 after(()=>db.close());
 
-test('migration preserves old access, defaults future users to pending and is repeatable',()=>{
+test('new database accounts default to pending, member role and enabled access',()=>{
   assert.equal(db.prepare("SELECT status FROM users WHERE id='legacy'").get().status,'approved');
   assert.equal(db.prepare("SELECT role, access_enabled FROM users WHERE id='legacy'").get().role,'member');
   assert.equal(db.prepare("SELECT access_enabled FROM users WHERE id='legacy'").get().access_enabled,1);
   assert.deepEqual(db.prepare("SELECT registration_ip, last_login_ip FROM users WHERE id='legacy'").get(),{registration_ip:null,last_login_ip:null});
   db.prepare('INSERT INTO users(id,email,password_hash) VALUES(?,?,?)').run('new','new@example.com','hash');
-  membership.initializeMembership(db);
-  adminMembers.initializeAdminMembers(db);
   assert.equal(db.prepare("SELECT status FROM users WHERE id='new'").get().status,'pending');
   assert.equal(db.prepare("SELECT role, access_enabled FROM users WHERE id='new'").get().role,'member');
 });
-test('public member count includes only approved enabled member accounts',()=>{
-  assert.equal(auth.getActiveMemberCount(),1);
+test('public member count includes only approved enabled member accounts',async()=>{
+  assert.equal(await auth.getActiveMemberCount(),1);
   db.exec("INSERT INTO users(id,email,password_hash,status,role,access_enabled) VALUES ('pending-count','pending-count@example.com','hash','pending','member',1),('disabled-count','disabled-count@example.com','hash','approved','member',0),('admin-count','admin-count@example.com','hash','approved','admin',1)");
-  assert.equal(auth.getActiveMemberCount(),1);
+  assert.equal(await auth.getActiveMemberCount(),1);
 });
-test('social link storage validates HTTPS URLs and supports add/remove',()=>{
-  assert.deepEqual(socialLinks.listPublicSocialLinks(db),[]);
-  const first=socialLinks.addPublicSocialLink(db,'telegram','https://t.me/nrbtccambodia',()=> 'social-one');
+test('social link storage validates HTTPS URLs and supports add/remove',async()=>{
+  assert.deepEqual(await socialLinks.listPublicSocialLinks(),[]);
+  const first=await socialLinks.addPublicSocialLink('telegram','https://t.me/nrbtccambodia',()=> 'social-one');
   assert.equal(first.platform,'telegram');
-  assert.equal(socialLinks.listPublicSocialLinks(db)[0].url,'https://t.me/nrbtccambodia');
+  assert.equal((await socialLinks.listPublicSocialLinks())[0].url,'https://t.me/nrbtccambodia');
   for(const [platform,url] of [['unknown','https://example.com'],['instagram','javascript:alert(1)'],['instagram','https://user:pass@example.com']]) {
-    assert.throws(()=>socialLinks.addPublicSocialLink(db,platform,url,()=> 'invalid'),socialLinks.PublicSocialLinkError);
+    await assert.rejects(socialLinks.addPublicSocialLink(platform,url,()=> 'invalid'),socialLinks.PublicSocialLinkError);
   }
-  assert.deepEqual(socialLinks.removePublicSocialLink(db,first.id),{id:'social-one'});
-  assert.deepEqual(socialLinks.listPublicSocialLinks(db),[]);
+  assert.deepEqual(await socialLinks.removePublicSocialLink(first.id),{id:'social-one'});
+  assert.deepEqual(await socialLinks.listPublicSocialLinks(),[]);
 });
 test('IP capture accepts valid trusted proxy addresses and ignores untrusted forwarding headers',()=>{
   assert.equal(auth.getClientIp(new Request('http://localhost',{headers:{'x-real-ip':'2001:db8::1'}})),'2001:db8::1');
@@ -79,7 +74,7 @@ test('registration notifies only admin, creates no session; pending login and se
   const response=await register.POST(req({email:'applicant@example.com',password},'http://localhost','198.51.100.10'));
   assert.equal(response.status,202);assert.equal((await response.json()).status,'verification_required');
   assert.equal(cookieJar.size,0);assert.equal(verificationMails.at(-1).email,'applicant@example.com');
-  const member=auth.getUserByEmail('applicant@example.com');
+  const member=await auth.getUserByEmail('applicant@example.com');
   assert.equal(member.status,'pending');assert.equal(member.email_verified,0);
   assert.equal(db.prepare('SELECT registration_ip FROM users WHERE id=?').get(member.id).registration_ip,'198.51.100.10');
   assert.equal((await login.POST(req({email:member.email,password}))).status,403);
@@ -90,14 +85,14 @@ test('registration notifies only admin, creates no session; pending login and se
 test('review inspection is read-only; explicit approval permits login and token cannot be replayed',async()=>{
   const verificationToken=verificationMails.at(-1).token;
   assert.equal((await verifyEmail.POST(req({token:verificationToken}))).status,200);
-  assert.equal(auth.getUserByEmail('applicant@example.com').email_verified,1);
+  assert.equal((await auth.getUserByEmail('applicant@example.com')).email_verified,1);
   assert.equal(mails.at(-1).email,'applicant@example.com');
-  const record=db.prepare('SELECT * FROM membership_reviews WHERE user_id=?').get(auth.getUserByEmail('applicant@example.com').id);
+  const record=db.prepare('SELECT * FROM membership_reviews WHERE user_id=?').get((await auth.getUserByEmail('applicant@example.com')).id);
   assert.equal(record.recipient,'owner@example.com');assert.equal(record.delivery,'sent');
   assert.equal((await verifyEmail.POST(req({token:verificationToken}))).status,410);
   const token=mails.at(-1).token;
   const inspect=await approval.POST(req({token,action:'inspect'}));assert.equal(inspect.status,200);
-  assert.equal(auth.getUserByEmail('applicant@example.com').status,'pending');
+  assert.equal((await auth.getUserByEmail('applicant@example.com')).status,'pending');
   assert.equal((await approval.POST(req({token,action:'approved'},'https://evil.example'))).status,403);
   assert.equal((await approval.POST(req({token,action:'approved'}))).status,200);
   assert.equal((await approval.POST(req({token,action:'rejected'}))).status,410);
@@ -107,32 +102,32 @@ test('review inspection is read-only; explicit approval permits login and token 
   db.prepare("UPDATE users SET status='rejected' WHERE email=?").run('applicant@example.com');
   assert.equal(await auth.getCurrentUser(),null);cookieJar.clear();
 });
-test('expired, superseded and rejected requests cannot grant access',()=>{
-  const user=auth.createUser('reject@example.com','hash');
-  const first=membership.issueReview(db,user.id,'owner@example.com',1000);
-  assert.equal(membership.reviewDetails(db,first.token,1000+72*60*60*1000),null);
-  const second=membership.issueReview(db,user.id,'owner@example.com',2000);
-  assert.equal(membership.decideReview(db,first.token,'approved',2001),false);
-  assert.equal(membership.decideReview(db,second.token,'rejected',2001),true);
-  assert.equal(membership.decideReview(db,second.token,'approved',2002),false);
-  assert.equal(auth.getUserByEmail(user.email).status,'rejected');
+test('expired, superseded and rejected requests cannot grant access',async()=>{
+  const user=await auth.createUser('reject@example.com','hash');
+  const first=await membership.issueReview(user.id,'owner@example.com',1000);
+  assert.equal(await membership.reviewDetails(first.token,1000+72*60*60*1000),null);
+  const second=await membership.issueReview(user.id,'owner@example.com',2000);
+  assert.equal(await membership.decideReview(first.token,'approved',2001),false);
+  assert.equal(await membership.decideReview(second.token,'rejected',2001),true);
+  assert.equal(await membership.decideReview(second.token,'approved',2002),false);
+  assert.equal((await auth.getUserByEmail(user.email)).status,'rejected');
 });
 test('email failure keeps pending; authenticated retry resends without changing the password',async()=>{
   mailFails=true;
   assert.equal((await register.POST(req({email:'retry@example.com',password}))).status,503);
-  const user=auth.getUserByEmail('retry@example.com'),oldToken=verificationMails.at(-1).token;
+  const user=await auth.getUserByEmail('retry@example.com'),oldToken=verificationMails.at(-1).token;
   assert.equal(user.status,'pending');assert.equal(user.email_verified,0);assert.equal(cookieJar.size,0);
   mailFails=false;
   assert.equal((await register.POST(req({email:user.email,password:'Wrong-password-123!'}))).status,409);
   assert.equal((await register.POST(req({email:user.email,password}))).status,202);
-  assert.equal(auth.getUserByEmail(user.email).password_hash,user.password_hash);
+  assert.equal((await auth.getUserByEmail(user.email)).password_hash,user.password_hash);
   assert.equal((await verifyEmail.POST(req({token:oldToken}))).status,410);
   assert.equal((await verifyEmail.POST(req({token:verificationMails.at(-1).token}))).status,200);
 });
 test('missing mail configuration fails before creating an account',async()=>{
   const blocked=load('app/api/auth/register/route.ts',{...deps,'@/app/lib/approval-mail':{...mail,approvalMailConfig:()=>{throw new MailConfigError();}}});
   assert.equal((await blocked.POST(req({email:'unconfigured@example.com',password}))).status,503);
-  assert.equal(auth.getUserByEmail('unconfigured@example.com'),undefined);
+  assert.equal(await auth.getUserByEmail('unconfigured@example.com'),undefined);
 });
 
 test('mail transport sends private review only to configured owner and never to applicant',async()=>{
@@ -163,15 +158,15 @@ test('mail transport sends private review only to configured owner and never to 
 
 test('admin dashboard restricts access and manages membership and immediate access revocation',async()=>{
   const memberPassword=await auth.hashPassword(password);
-  const pending=auth.createUser('managed@example.com',memberPassword);
+  const pending=await auth.createUser('managed@example.com',memberPassword);
   assert.equal((await adminRoute.GET()).status,401);
-  const ordinary=auth.createUser('ordinary@example.com',memberPassword);
+  const ordinary=await auth.createUser('ordinary@example.com',memberPassword);
   db.prepare("UPDATE users SET status='approved' WHERE id=?").run(ordinary.id);
   await auth.createSession(ordinary);
   const nonAdminResponse=await adminRoute.GET();
   assert.equal(nonAdminResponse.status,403);
 
-  const administrator=auth.createUser('administrator@example.com',memberPassword);
+  const administrator=await auth.createUser('administrator@example.com',memberPassword);
   db.prepare("UPDATE users SET status='approved', role='admin' WHERE id=?").run(administrator.id);
   await auth.createSession(administrator);
   const listing=await adminRoute.GET();
@@ -185,14 +180,14 @@ test('admin dashboard restricts access and manages membership and immediate acce
 
   const approve=await adminRoute.PATCH(req({userId:pending.id,action:'approve'}));
   assert.equal(approve.status,200);
-  assert.equal(auth.getUserByEmail(pending.email).status,'approved');
+  assert.equal((await auth.getUserByEmail(pending.email)).status,'approved');
   assert.equal((await adminRoute.PATCH(req({userId:pending.id,action:'approve'}))).status,409);
-  const unverified=auth.createUser('unverified@example.com',memberPassword,null,false);
+  const unverified=await auth.createUser('unverified@example.com',memberPassword,null,false);
   assert.equal((await adminRoute.PATCH(req({userId:unverified.id,action:'approve'}))).status,409);
 
-  const rejectTarget=auth.createUser('reject-by-admin@example.com',memberPassword);
+  const rejectTarget=await auth.createUser('reject-by-admin@example.com',memberPassword);
   assert.equal((await adminRoute.PATCH(req({userId:rejectTarget.id,action:'reject'}))).status,200);
-  assert.equal(auth.getUserByEmail(rejectTarget.email).status,'rejected');
+  assert.equal((await auth.getUserByEmail(rejectTarget.email)).status,'rejected');
   assert.equal((await adminRoute.PATCH(req({userId:administrator.id,action:'disable'}))).status,403);
 
   await auth.createSession(pending);
@@ -204,7 +199,7 @@ test('admin dashboard restricts access and manages membership and immediate acce
   assert.equal(await auth.getCurrentUser(),null);
   await auth.createSession(administrator);
   assert.equal((await adminRoute.PATCH(req({userId:pending.id,action:'enable'}))).status,200);
-  assert.equal(auth.getUserByEmail(pending.email).access_enabled,1);
+  assert.equal((await auth.getUserByEmail(pending.email)).access_enabled,1);
   const refreshed=await adminRoute.GET();
   const refreshedBody=await refreshed.json();
   assert.ok(refreshedBody.audit.some(item=>item.action==='disable'&&item.targetEmail===pending.email));
@@ -214,11 +209,11 @@ test('public social-link endpoint is public to read but restricted to administra
   cookieJar.clear();
   assert.equal((await socialRoute.GET()).status,200);
   assert.equal((await socialRoute.POST(req({platform:'instagram',url:'https://instagram.com/example'}))).status,401);
-  const member=auth.createUser('social-member@example.com',await auth.hashPassword(password));
+  const member=await auth.createUser('social-member@example.com',await auth.hashPassword(password));
   db.prepare("UPDATE users SET status='approved' WHERE id=?").run(member.id);
   await auth.createSession(member);
   assert.equal((await socialRoute.POST(req({platform:'instagram',url:'https://instagram.com/example'}))).status,403);
-  const admin=auth.createUser('social-admin@example.com',await auth.hashPassword(password));
+  const admin=await auth.createUser('social-admin@example.com',await auth.hashPassword(password));
   db.prepare("UPDATE users SET status='approved',role='admin' WHERE id=?").run(admin.id);
   await auth.createSession(admin);
   const added=await socialRoute.POST(req({platform:'instagram',url:'https://instagram.com/example'}));

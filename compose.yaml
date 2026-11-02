@@ -10,13 +10,9 @@ services:
       NODE_ENV: production
       HOSTNAME: 0.0.0.0
       PORT: "3000"
-      AUTH_DB_PATH: /app/data/auth.sqlite
       APP_BASE_URL: https://${APP_DOMAIN:?Set APP_DOMAIN in .env.production}
     expose:
       - "3000"
-    volumes:
-      - auth_data:/app/data
-      - auth_backups:/backups
     init: true
     security_opt:
       - no-new-privileges:true
@@ -52,7 +48,5 @@ services:
       - no-new-privileges:true
 
 volumes:
-  auth_data:
-  auth_backups:
   caddy_data:
   caddy_config:

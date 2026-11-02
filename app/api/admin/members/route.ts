@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { allowAuthAttempt, database, getCurrentUser } from "@/app/lib/auth";
+import { allowAuthAttempt, getCurrentUser } from "@/app/lib/auth";
 import { listAdminAuditEvents, listAdminMembers, updateAdminMember, AdminMemberError } from "@/app/lib/admin-members";
 import { authJson, isSameOriginRequest, readAuthJson } from "@/app/lib/auth-http";
 
@@ -19,7 +19,7 @@ export async function GET() {
   const access = await requireAdmin();
   if ("response" in access) return access.response;
   return Response.json(
-    { members: listAdminMembers(database), audit: listAdminAuditEvents(database) },
+    { members: await listAdminMembers(), audit: await listAdminAuditEvents() },
     { headers: { "Cache-Control": "no-store" } },
   );
 }
@@ -31,8 +31,7 @@ export async function PATCH(request: Request) {
   const body = await readAuthJson(request);
   if (!body) return authJson("ទិន្នន័យសំណើមិនត្រឹមត្រូវទេ។", 400);
   try {
-    const result = updateAdminMember(
-      database,
+    const result = await updateAdminMember(
       access.user,
       body.userId,
       body.action,

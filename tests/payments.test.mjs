@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { createHmac } from 'node:crypto';
 import ts from 'typescript';
+import { createDatabase, databaseAdapter } from './helpers/database-adapter.mjs';
 const require=createRequire(import.meta.url);
 function load(file,deps={}) {
   const loaded={exports:{}};
@@ -49,19 +50,18 @@ test('bank configuration and provider errors do not expose secret values',async(
   assert.throws(()=>aba.paymentConfig(),aba.PaymentConfigurationError);
   process.env.ABA_PAYWAY_API_KEY=key;
 });
-test('payment records isolate members and keep provider-confirmed status in persistent storage',()=>{
-  const Database=require('better-sqlite3'),database=new Database(':memory:');
-  database.pragma('foreign_keys=ON');
-  database.exec("CREATE TABLE users (id TEXT PRIMARY KEY); INSERT INTO users VALUES ('alice'),('bob')");
-  const store=load('app/lib/payments/store.ts',{'../auth':{database}});
-  store.createPaymentRecord('invoice1','alice','10.00','USD','sandbox');
-  assert.equal(store.paymentRecord('bob','invoice1'),undefined);
-  store.setPaymentStatus('bob','invoice1','paid');
-  assert.equal(store.paymentRecord('alice','invoice1').status,'creating');
-  store.setPaymentQr('alice','invoice1','data:image/png;base64,aGVsbG8=');
-  assert.equal(store.paymentRecord('alice','invoice1').status,'pending');
-  store.setPaymentStatus('alice','invoice1','paid');
-  assert.equal(store.listPaymentRecords('alice')[0].status,'paid');
-  assert.equal(store.listPaymentRecords('bob').length,0);
+test('payment records isolate members and keep provider-confirmed status in persistent storage',async()=>{
+  const database=createDatabase();
+  database.exec("INSERT INTO users (id,email,password_hash) VALUES ('alice','alice@example.com','x'),('bob','bob@example.com','x')");
+  const store=load('app/lib/payments/store.ts',{'../database':databaseAdapter(database)});
+  await store.createPaymentRecord('invoice1','alice','10.00','USD','sandbox');
+  assert.equal(await store.paymentRecord('bob','invoice1'),undefined);
+  await store.setPaymentStatus('bob','invoice1','paid');
+  assert.equal((await store.paymentRecord('alice','invoice1')).status,'creating');
+  await store.setPaymentQr('alice','invoice1','data:image/png;base64,aGVsbG8=');
+  assert.equal((await store.paymentRecord('alice','invoice1')).status,'pending');
+  await store.setPaymentStatus('alice','invoice1','paid');
+  assert.equal((await store.listPaymentRecords('alice'))[0].status,'paid');
+  assert.equal((await store.listPaymentRecords('bob')).length,0);
   database.close();
 });

@@ -24,14 +24,14 @@ export async function POST(request: Request) {
 
   try {
     const config = approvalMailConfig();
-    const user = verifyUserEmail(body.token);
+    const user = await verifyUserEmail(body.token);
     if (!user) return authJson("តំណផ្ទៀងផ្ទាត់នេះផុតកំណត់ បានប្រើរួច ឬមិនត្រឹមត្រូវ។", 410);
-    const review = createApprovalReview(user.id, config.to);
+    const review = await createApprovalReview(user.id, config.to);
     try {
       await sendApprovalEmail(user.email, review.token, review.hash);
-      markApprovalDelivery(review.hash, "sent");
+      await markApprovalDelivery(review.hash, "sent");
     } catch {
-      markApprovalDelivery(review.hash, "failed");
+      await markApprovalDelivery(review.hash, "failed");
       return authJson("អ៊ីមែលបានផ្ទៀងផ្ទាត់ ប៉ុន្តែមិនអាចផ្ញើសំណើទៅអ្នកគ្រប់គ្រងបានទេ។ សូមចុះឈ្មោះម្ដងទៀតដោយព័ត៌មានដដែល ដើម្បីផ្ញើសំណើឡើងវិញ។", 503);
     }
     return Response.json({

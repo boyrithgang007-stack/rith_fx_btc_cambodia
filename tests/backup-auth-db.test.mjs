@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import Database from 'better-sqlite3';
 
-test('auth database backup creates a consistent SQLite copy without touching the source', async () => {
+test('legacy SQLite backup creates a consistent copy without touching the source', async () => {
   const directory = await mkdtemp(path.join(os.tmpdir(), 'rfx-auth-backup-'));
   const source = path.join(directory, 'source.sqlite');
   const output = path.join(directory, 'backups');
@@ -20,7 +20,7 @@ test('auth database backup creates a consistent SQLite copy without touching the
     database.close();
     database = null;
 
-    const result = spawnSync(process.execPath, ['scripts/backup-auth-db.mjs', output], {
+    const result = spawnSync(process.execPath, ['scripts/backup-sqlite-legacy.mjs', output], {
       cwd: process.cwd(),
       encoding: 'utf8',
       env: { ...process.env, AUTH_DB_PATH: source },

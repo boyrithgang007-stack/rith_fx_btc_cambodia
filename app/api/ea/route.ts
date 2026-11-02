@@ -25,12 +25,13 @@ export async function GET() {
   const user = await getCurrentUser();
   if (!user) return authJson("សូមចូលគណនីដែលបានអនុម័តជាមុន។", 401);
   return Response.json({
-    settings: getEaSettings(user.id),
+    settings: await getEaSettings(user.id),
+    automationAvailable: process.env.VERCEL !== "1",
     encryptionConfigured: encryptionConfigured(),
-    credentialsConfigured: hasEaCredentials(user.id),
-    testnetVerified: isEaTestnetVerified(user.id),
-    runs: listEaRuns(user.id),
-    audit: listEaAuditEvents(user.id),
+    credentialsConfigured: await hasEaCredentials(user.id),
+    testnetVerified: await isEaTestnetVerified(user.id),
+    runs: await listEaRuns(user.id),
+    audit: await listEaAuditEvents(user.id),
   }, { headers: { "Cache-Control": "no-store" } });
 }
 
@@ -43,25 +44,29 @@ export async function POST(request: Request) {
   const body = await readAuthJson(request);
   const settings = parseEaSettings(body?.settings);
   if (!settings) return authJson("ការកំណត់ EA មិនត្រឹមត្រូវទេ។", 400);
+  if (settings.enabled && process.env.VERCEL === "1") {
+    return authJson("Automatic EA polling is unavailable on Vercel serverless. Keep the EA disabled or run a separately secured worker.", 503);
+  }
   const credentials = body?.credentials === undefined ? undefined : parseEaCredentials(body.credentials);
   if (body?.credentials !== undefined && !credentials) return authJson("Binance Futures Testnet API key ឬ secret មិនត្រឹមត្រូវទេ។", 400);
 
   try {
     assertVaultConfigured();
     if (credentials) {
-      saveEaSettings(user.id, { ...settings, enabled: false }, credentials);
+      await saveEaSettings(user.id, { ...settings, enabled: false }, credentials);
       await new BinanceFuturesTestnet(credentials).verifyAccount();
-      markEaTestnetVerified(user.id);
-    } else if (settings.enabled && (!hasEaCredentials(user.id) || !isEaTestnetVerified(user.id))) {
+      await markEaTestnetVerified(user.id);
+    } else if (settings.enabled && (!(await hasEaCredentials(user.id)) || !(await isEaTestnetVerified(user.id)))) {
       return authJson("សូមភ្ជាប់ និងផ្ទៀងផ្ទាត់ Binance Futures Testnet មុនបើក EA។", 409);
     }
     return Response.json({
-      settings: saveEaSettings(user.id, settings),
+      settings: await saveEaSettings(user.id, settings),
+      automationAvailable: process.env.VERCEL !== "1",
       encryptionConfigured: encryptionConfigured(),
-      credentialsConfigured: hasEaCredentials(user.id),
-      testnetVerified: isEaTestnetVerified(user.id),
-      runs: listEaRuns(user.id),
-      audit: listEaAuditEvents(user.id),
+      credentialsConfigured: await hasEaCredentials(user.id),
+      testnetVerified: await isEaTestnetVerified(user.id),
+      runs: await listEaRuns(user.id),
+      audit: await listEaAuditEvents(user.id),
     }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     if (error instanceof VaultConfigurationError) return authJson("Server មិនទាន់កំណត់ encryption សម្រាប់ EA credentials ទេ។", 503);
@@ -75,6 +80,6 @@ export async function DELETE(request: Request) {
   const user = await getCurrentUser();
   if (!user) return authJson("សូមចូលគណនីដែលបានអនុម័តជាមុន។", 401);
   if (!allowAuthAttempt(`ea-disconnect:${user.id}`, 5, 60000)) return authJson("ព្យាយាមច្រើនដងពេក។ សូមរង់ចាំមួយនាទី។", 429);
-  removeEaCredentials(user.id);
+  await removeEaCredentials(user.id);
   return Response.json({ disconnected: true }, { headers: { "Cache-Control": "no-store" } });
 }

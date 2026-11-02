@@ -48,7 +48,9 @@ export async function readAccount(c: AccountCredentials, fetcher: typeof fetch =
   try {
     if (c.provider === "binance") return await readBinanceAccount(c, fetcher);
     if (c.provider === "mt5") {
-      const url = new URL(process.env.MT5_BRIDGE_URL || "http://127.0.0.1:8787");
+      const bridgeUrl = process.env.MT5_BRIDGE_URL?.trim();
+      if (process.env.VERCEL === "1" && !bridgeUrl) throw new BinanceConnectionError("Set MT5_BRIDGE_URL to a secured, reachable HTTPS bridge; localhost is not reachable from Vercel.");
+      const url = new URL(bridgeUrl || "http://127.0.0.1:8787");
       if (url.username || url.password || url.search || url.hash || url.pathname !== "/" || !(url.protocol === "https:" || (url.protocol === "http:" && ["127.0.0.1", "localhost"].includes(url.hostname)))) throw new BinanceConnectionError("MT5 bridge requires HTTPS or local loopback.");
       const token = process.env.MT5_BRIDGE_TOKEN;
       if (!token || token.length < 32) throw new BinanceConnectionError("The administrator must configure the Exness MT5 bridge first.");
@@ -82,7 +84,9 @@ export async function readAccount(c: AccountCredentials, fetcher: typeof fetch =
 export async function readMt5ForexCandles(c: AccountCredentials, symbol: ForexSymbol, fetcher: typeof fetch = fetch) {
   if (c.provider !== "mt5") throw new BinanceConnectionError("Choose a connected Exness MT5 account.");
   try {
-    const url = new URL(process.env.MT5_BRIDGE_URL || "http://127.0.0.1:8787");
+    const bridgeUrl = process.env.MT5_BRIDGE_URL?.trim();
+    if (process.env.VERCEL === "1" && !bridgeUrl) throw new BinanceConnectionError("Set MT5_BRIDGE_URL to a secured, reachable HTTPS bridge; localhost is not reachable from Vercel.");
+    const url = new URL(bridgeUrl || "http://127.0.0.1:8787");
     if (url.username || url.password || url.search || url.hash || url.pathname !== "/" || !(url.protocol === "https:" || (url.protocol === "http:" && ["127.0.0.1", "localhost"].includes(url.hostname)))) {
       throw new BinanceConnectionError("MT5 bridge requires HTTPS or local loopback.");
     }

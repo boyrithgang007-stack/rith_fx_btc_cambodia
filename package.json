@@ -2,6 +2,9 @@
   "name": "khmer-video-studio",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,11 +12,12 @@
     "lint": "eslint",
     "test": "node --test tests/*.test.mjs",
     "admin:bootstrap": "node scripts/bootstrap-admin.mjs",
-    "db:backup": "node scripts/backup-auth-db.mjs"
+    "db:backup": "node scripts/backup-auth-db.mjs",
+    "db:backup:sqlite-legacy": "node scripts/backup-sqlite-legacy.mjs"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.2.0",
     "bcryptjs": "^3.0.3",
-    "better-sqlite3": "^13.0.3",
     "ffmpeg-static": "^5.2.0",
     "jose": "^6.2.12",
     "next": "^16.3.8",
@@ -29,6 +33,7 @@
     "@types/nodemailer": "^8.0.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "better-sqlite3": "^13.0.3",
     "eslint": "^9",
     "eslint-config-next": "^16.3.8",
     "tailwindcss": "^4",

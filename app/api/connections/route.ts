@@ -10,7 +10,7 @@ export const runtime = "nodejs";
 export async function GET() {
   const user = await getCurrentUser();
   if (!user) return authJson("Please sign in to an approved account.", 401);
-  return Response.json({ connections: listConnections(user.id) }, { headers: { "Cache-Control": "no-store" } });
+  return Response.json({ connections: await listConnections(user.id) }, { headers: { "Cache-Control": "no-store" } });
 }
 
 export async function POST(request: Request) {
@@ -24,8 +24,8 @@ export async function POST(request: Request) {
   try {
     assertVaultConfigured();
     await readAccount(credentials);
-    saveConnection(user.id, credentials);
-    return Response.json({ connections: listConnections(user.id) }, { status: 201, headers: { "Cache-Control": "no-store" } });
+    await saveConnection(user.id, credentials);
+    return Response.json({ connections: await listConnections(user.id) }, { status: 201, headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     if (error instanceof VaultConfigurationError) return authJson("Account connections require server encryption configuration.", 503);
     if (error instanceof BinanceConnectionError) return authJson(error.message, 502);

@@ -49,7 +49,7 @@ export async function PATCH(request: Request) {
     if (typeof body.currentPassword !== "string" || body.currentPassword.length > 72 || !passwordIsValid(body.newPassword)) {
       return authJson("សូមបញ្ចូលពាក្យសម្ងាត់បច្ចុប្បន្ន និងពាក្យសម្ងាត់ថ្មីយ៉ាងតិច 12 តួអក្សរ។", 400);
     }
-    const account = getUserByEmail(user.email);
+    const account = await getUserByEmail(user.email);
     if (!account || !(await verifyPassword(body.currentPassword, account.password_hash))) {
       return authJson("ពាក្យសម្ងាត់បច្ចុប្បន្នមិនត្រឹមត្រូវទេ។", 401);
     }
@@ -57,7 +57,7 @@ export async function PATCH(request: Request) {
   }
 
   try {
-    const updated = updateUserProfile(user.id, displayName, body.avatarDataUrl, passwordHash);
+    const updated = await updateUserProfile(user.id, displayName, body.avatarDataUrl, passwordHash);
     if (!updated) return authJson("រកមិនឃើញគណនីសម្រាប់ធ្វើបច្ចុប្បន្នភាពទេ។", 404);
     return Response.json({ user: updated }, { headers: { "Cache-Control": "no-store" } });
   } catch {

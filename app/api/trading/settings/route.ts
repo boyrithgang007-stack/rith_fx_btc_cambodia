@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 export async function GET() {
   const user = await getCurrentUser();
   if (!user) return authJson("Please sign in to an approved account.", 401);
-  return Response.json({ settings: getTradingRiskSettings(user.id) }, { headers: { "Cache-Control": "no-store" } });
+  return Response.json({ settings: await getTradingRiskSettings(user.id) }, { headers: { "Cache-Control": "no-store" } });
 }
 
 export async function PATCH(request: Request) {
@@ -20,5 +20,5 @@ export async function PATCH(request: Request) {
   const body = await readAuthJson(request);
   const settings = parseTradingRiskSettings(body);
   if (!settings) return authJson("កំណត់ទំហំក្នុងមួយ order ចាប់ពី $1 ដល់ $100,000 និងកម្រិតប្រចាំថ្ងៃមិនតិចជាងទំហំមួយ order និងមិនលើស $1,000,000។", 400);
-  return Response.json({ settings: saveTradingRiskSettings(user.id, settings) }, { headers: { "Cache-Control": "no-store" } });
+  return Response.json({ settings: await saveTradingRiskSettings(user.id, settings) }, { headers: { "Cache-Control": "no-store" } });
 }

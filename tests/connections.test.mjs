@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import ts from 'typescript';
+import { createDatabase, databaseAdapter } from './helpers/database-adapter.mjs';
 const require = createRequire(import.meta.url);
 function load(file, deps = {}) {
   const loaded = { exports: {} };
@@ -15,11 +16,10 @@ const vault = load('app/lib/exchanges/vault.ts');
 const binance = load('app/lib/exchanges/binance.ts');
 const accounts = load('app/lib/exchanges/accounts.ts', {'./binance': binance});
 const credentials = { provider:'binance', apiKey:'a'.repeat(32), apiSecret:'b'.repeat(32) };
-const Database = require('better-sqlite3');
-const db = new Database(':memory:');
-db.pragma('foreign_keys = ON');
-db.exec("CREATE TABLE users (id TEXT PRIMARY KEY); INSERT INTO users VALUES ('alice'), ('bob')");
-const store = load('app/lib/exchanges/store.ts', {'../auth':{database:db}, './vault':vault, './accounts':accounts});
+const db = createDatabase();
+db.exec("INSERT INTO users (id,email,password_hash) VALUES ('alice','alice@example.com','x'),('bob','bob@example.com','x')");
+const adapter = databaseAdapter(db);
+const store = load('app/lib/exchanges/store.ts', {'../database':adapter, './vault':vault, './accounts':accounts});
 
 test('vault authenticates ciphertext and binds credentials to owner/connection', () => {
   const sealed = vault.sealCredentials(credentials,'alice:1');
@@ -32,36 +32,36 @@ test('vault authenticates ciphertext and binds credentials to owner/connection',
   assert.throws(() => vault.sealCredentials(credentials,'alice:1'),vault.VaultConfigurationError);
   process.env.EXCHANGE_ENCRYPTION_KEY = original;
 });
-test('connections isolate users, redact secrets, replace credentials and audit disconnects', () => {
-  store.saveConnection('alice',credentials);
-  const connection = store.listConnections('alice')[0];
-  assert.equal(store.listConnections('bob').length,0);
-  assert.equal(store.connectionCredentials('bob',connection.id),null);
-  assert.equal(store.removeConnection('bob',connection.id),false);
+test('connections isolate users, redact secrets, replace credentials and audit disconnects', async () => {
+  await store.saveConnection('alice',credentials);
+  const connection = (await store.listConnections('alice'))[0];
+  assert.equal((await store.listConnections('bob')).length,0);
+  assert.equal(await store.connectionCredentials('bob',connection.id),null);
+  assert.equal(await store.removeConnection('bob',connection.id),false);
   assert.ok(!JSON.stringify(connection).includes('apiSecret'));
   const updated = {...credentials,apiSecret:'c'.repeat(32)};
-  store.saveConnection('alice',updated);
-  assert.equal(store.listConnections('alice').length,1);
-  assert.equal(store.listConnections('alice')[0].id,connection.id);
-  assert.deepEqual(store.connectionCredentials('alice',connection.id),updated);
-  assert.equal(store.removeConnection('alice',connection.id),true);
-  assert.equal(store.connectionCredentials('alice',connection.id),null);
+  await store.saveConnection('alice',updated);
+  assert.equal((await store.listConnections('alice')).length,1);
+  assert.equal((await store.listConnections('alice'))[0].id,connection.id);
+  assert.deepEqual(await store.connectionCredentials('alice',connection.id),updated);
+  assert.equal(await store.removeConnection('alice',connection.id),true);
+  assert.equal(await store.connectionCredentials('alice',connection.id),null);
   assert.equal(db.prepare('SELECT COUNT(*) n FROM connection_audit').get().n,3);
 });
-test('per-user trading risk settings persist exact USD limits and reject invalid caps', () => {
-  const tradingDb = new Database(':memory:');
-  tradingDb.exec("CREATE TABLE users (id TEXT PRIMARY KEY); INSERT INTO users VALUES ('alice'), ('bob')");
-  const settings = load('app/lib/trading/settings.ts', {'../auth':{database:tradingDb}});
-  assert.deepEqual(settings.getTradingRiskSettings('alice'),{maxOrderUsd:50,dailyLimitUsd:200,updatedAt:null});
+test('per-user trading risk settings persist exact USD limits and reject invalid caps', async () => {
+  const tradingDb = createDatabase();
+  tradingDb.exec("INSERT INTO users (id,email,password_hash) VALUES ('alice','alice@example.com','x'),('bob','bob@example.com','x')");
+  const settings = load('app/lib/trading/settings.ts', {'../database':databaseAdapter(tradingDb)});
+  assert.deepEqual(await settings.getTradingRiskSettings('alice'),{maxOrderUsd:50,dailyLimitUsd:200,updatedAt:null});
   assert.deepEqual(settings.parseTradingRiskSettings({maxOrderUsd:125.5,dailyLimitUsd:500}),{maxOrderUsd:125.5,dailyLimitUsd:500});
   assert.equal(settings.parseTradingRiskSettings({maxOrderUsd:0.99,dailyLimitUsd:200}),null);
   assert.equal(settings.parseTradingRiskSettings({maxOrderUsd:100001,dailyLimitUsd:200000}),null);
   assert.equal(settings.parseTradingRiskSettings({maxOrderUsd:100,dailyLimitUsd:99}),null);
   assert.equal(settings.parseTradingRiskSettings({maxOrderUsd:1.001,dailyLimitUsd:200}),null);
-  const saved = settings.saveTradingRiskSettings('alice',{maxOrderUsd:125.5,dailyLimitUsd:500});
+  const saved = await settings.saveTradingRiskSettings('alice',{maxOrderUsd:125.5,dailyLimitUsd:500});
   assert.equal(saved.maxOrderUsd,125.5);
-  assert.equal(settings.getTradingRiskSettings('alice').dailyLimitUsd,500);
-  assert.deepEqual(settings.getTradingRiskSettings('bob'),{maxOrderUsd:50,dailyLimitUsd:200,updatedAt:null});
+  assert.equal((await settings.getTradingRiskSettings('alice')).dailyLimitUsd,500);
+  assert.deepEqual(await settings.getTradingRiskSettings('bob'),{maxOrderUsd:50,dailyLimitUsd:200,updatedAt:null});
   tradingDb.close();
 });
 test('credential validation rejects unsupported providers and injected headers', () => {

@@ -9,11 +9,11 @@ export async function POST(request: Request) {
   if (!body || !["inspect","approved","rejected"].includes(String(body.action))) return authJson("សំណើមិនត្រឹមត្រូវ។",400);
   try {
     if (body.action === "inspect") {
-      const review = getApprovalReview(body.token);
+      const review = await getApprovalReview(body.token);
       if (!review) return authJson("តំណនេះផុតកំណត់ ត្រូវបានប្រើ ឬមិនត្រឹមត្រូវ។",410);
       return Response.json({email:review.email,expiresAt:review.expires_at},{headers:{"Cache-Control":"no-store","Referrer-Policy":"no-referrer"}});
     }
-    if (!decideApprovalReview(body.token,body.action as "approved" | "rejected")) return authJson("តំណនេះផុតកំណត់ ត្រូវបានប្រើ ឬមិនត្រឹមត្រូវ។",410);
+    if (!await decideApprovalReview(body.token,body.action as "approved" | "rejected")) return authJson("តំណនេះផុតកំណត់ ត្រូវបានប្រើ ឬមិនត្រឹមត្រូវ។",410);
     return Response.json({status:body.action},{headers:{"Cache-Control":"no-store"}});
   } catch { return authJson("មិនអាចដំណើរការសំណើបានទេ។ សូមសាកល្បងម្ដងទៀត។",503); }
 }

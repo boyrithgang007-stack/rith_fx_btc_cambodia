@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import ts from 'typescript';
+import { createDatabase, databaseAdapter } from './helpers/database-adapter.mjs';
 
 const require = createRequire(import.meta.url);
 function load(file, deps = {}) {
@@ -15,12 +16,10 @@ function load(file, deps = {}) {
 }
 
 const rules = load('app/lib/ea/forex-rules.ts');
-const Database = require('better-sqlite3');
-const authDb = new Database(':memory:');
-authDb.exec(`CREATE TABLE users (id TEXT PRIMARY KEY);
-INSERT INTO users (id) VALUES ('alice'), ('bob');`);
+const authDb = createDatabase();
+authDb.exec("INSERT INTO users (id,email,password_hash) VALUES ('alice','alice@example.com','x'),('bob','bob@example.com','x')");
 const strategyStore = load('app/lib/ea/forex-store.ts', {
-  '../auth': { database: authDb },
+  '../database': databaseAdapter(authDb),
   './forex-rules': rules,
 });
 class AdapterError extends Error {}
@@ -90,16 +89,16 @@ test('Forex signal rejects malformed or insufficient candles', () => {
   assert.equal(rules.evaluateForexRule(stale, rule).action, 'WAIT');
 });
 
-test('Forex strategies are user-scoped and admin templates can be cloned', () => {
-  const personal = strategyStore.saveForexStrategy('alice', rule);
-  assert.equal(strategyStore.listForexStrategies('alice').length, 1);
-  assert.equal(strategyStore.listForexStrategies('bob').length, 0);
-  assert.throws(() => strategyStore.saveForexStrategy('bob', rule, personal.id));
-  const shared = strategyStore.saveForexStrategy('alice', { ...rule, name: 'Approved template' }, undefined, true, true);
-  assert.equal(strategyStore.listForexStrategies('bob')[0].isTemplate, true);
-  assert.throws(() => strategyStore.deleteForexStrategy('bob', shared.id, false));
-  assert.equal(strategyStore.deleteForexStrategy('alice', shared.id, true), true);
-  assert.throws(() => strategyStore.deleteForexStrategy('bob', personal.id, false));
+test('Forex strategies are user-scoped and admin templates can be cloned', async () => {
+  const personal = await strategyStore.saveForexStrategy('alice', rule);
+  assert.equal((await strategyStore.listForexStrategies('alice')).length, 1);
+  assert.equal((await strategyStore.listForexStrategies('bob')).length, 0);
+  await assert.rejects(strategyStore.saveForexStrategy('bob', rule, personal.id));
+  const shared = await strategyStore.saveForexStrategy('alice', { ...rule, name: 'Approved template' }, undefined, true, true);
+  assert.equal((await strategyStore.listForexStrategies('bob'))[0].isTemplate, true);
+  await assert.rejects(strategyStore.deleteForexStrategy('bob', shared.id, false));
+  assert.equal(await strategyStore.deleteForexStrategy('alice', shared.id, true), true);
+  await assert.rejects(strategyStore.deleteForexStrategy('bob', personal.id, false));
 });
 
 test('MT5 candle adapter calls only the private closed-candle route and validates the response', async () => {

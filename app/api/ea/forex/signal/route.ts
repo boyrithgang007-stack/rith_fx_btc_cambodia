@@ -18,10 +18,10 @@ export async function POST(request: Request) {
     || typeof body.connectionId !== "string" || body.connectionId.length > 64) {
     return authJson("Forex signal request is invalid.", 400);
   }
-  const strategy = listForexStrategies(user.id).find(item => item.id === body.strategyId);
+  const strategy = (await listForexStrategies(user.id)).find(item => item.id === body.strategyId);
   if (!strategy) return authJson("រកមិនឃើញ Forex strategy ទេ។", 404);
   try {
-    const credentials = connectionCredentials(user.id, body.connectionId);
+    const credentials = await connectionCredentials(user.id, body.connectionId);
     if (!credentials) return authJson("រកមិនឃើញ MT5 account ដែលបានភ្ជាប់ទេ។", 404);
     if (credentials.provider !== "mt5") return authJson("សូមជ្រើសរើស Exness MT5 account។", 400);
     const { candles, brokerSymbol } = await readMt5ForexCandles(credentials, strategy.rule.symbol);

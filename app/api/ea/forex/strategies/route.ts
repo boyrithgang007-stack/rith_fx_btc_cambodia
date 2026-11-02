@@ -17,7 +17,7 @@ async function authenticatedUser(request?: Request) {
 export async function GET() {
   const { user, response } = await authenticatedUser();
   if (response) return response;
-  return Response.json({ strategies: listForexStrategies(user!.id) }, { headers: { "Cache-Control": "no-store" } });
+  return Response.json({ strategies: await listForexStrategies(user!.id) }, { headers: { "Cache-Control": "no-store" } });
 }
 
 export async function POST(request: Request) {
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     return authJson("Forex strategy request is invalid.", 400);
   }
   try {
-    const strategy = saveForexStrategy(
+    const strategy = await saveForexStrategy(
       user!.id,
       body.rule,
       body.id as string | undefined,
@@ -55,7 +55,7 @@ export async function DELETE(request: Request) {
   const body = await readAuthJson(request);
   if (typeof body?.id !== "string" || body.id.length > 64) return authJson("Forex strategy ID មិនត្រឹមត្រូវទេ។", 400);
   try {
-    const deleted = deleteForexStrategy(user!.id, body.id, user!.role === "admin");
+    const deleted = await deleteForexStrategy(user!.id, body.id, user!.role === "admin");
     return deleted
       ? Response.json({ deleted: true })
       : authJson("រកមិនឃើញ Forex strategy ទេ។", 404);

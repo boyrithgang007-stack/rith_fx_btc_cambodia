@@ -13,7 +13,7 @@ export const maxDuration=60;
 const json=(body:unknown,status=200)=>Response.json(body,{status,headers:{"Cache-Control":"private, no-store"}});
 export async function GET(){
   const user=await getCurrentUser();if(!user)return json({error:"Sign in with an approved account."},401);
-  return json({aiConfigured:candleAiConfigured(),visionConfigured:visionConfigured(),forexConfigured:Boolean(process.env.TWELVEDATA_API_KEY?.trim()),cryptoProvider:"Binance public market data",aiProvider:"Google Gemini (server configuration required)",mode:"paper-research",reports:listCandleAnalysisReports(user.id)});
+  return json({aiConfigured:candleAiConfigured(),visionConfigured:visionConfigured(),forexConfigured:Boolean(process.env.TWELVEDATA_API_KEY?.trim()),cryptoProvider:"Binance public market data",aiProvider:"Google Gemini (server configuration required)",mode:"paper-research",reports:await listCandleAnalysisReports(user.id)});
 }
 export async function POST(request:Request){
   if(!isSameOriginRequest(request))return json({error:"Cross-origin requests are not allowed."},403);
@@ -34,7 +34,7 @@ export async function POST(request:Request){
     if(body.includeAi&&(ai.status!=="reviewed"||ai.consistent!==true))signal={...signal,action:"WAIT",entry:null,stopLoss:null,takeProfit:null,reason:checked.analysis?"AI could not confirm the rule assessment. No AI-reviewed entry setup.":checked.signal.reason};
     if(checked.expiresAt&&generatedAt>=checked.expiresAt)signal={...signal,action:"WAIT",entry:null,stopLoss:null,takeProfit:null,reason:"A new candle is due or data is stale. Generate a new report."};
     const report:CandleAnalysisReport={id:randomUUID(),market,frame,source:feed.source,generatedAt,asOf:feed.candles.at(-1)?.time??null,expiresAt:checked.expiresAt,candles:feed.candles.slice(-100),trend:checked.analysis?.trend??"UNAVAILABLE",ema:checked.analysis?.ema.slice(-100)??[],signal,ai,volumeAvailable:feed.volumeAvailable};
-    saveCandleAnalysisReport(user.id,report);
+    await saveCandleAnalysisReport(user.id,report);
     return json(report);
   }catch(error){return json({error:error instanceof CandleFeedError?error.message:"Unable to fetch or validate candle data. No signal generated."},error instanceof CandleFeedError?error.status:502);}
 }

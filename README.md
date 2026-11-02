@@ -4,16 +4,16 @@ A Next.js market dashboard with Crypto, Forex reference rates, an FVG paper stra
 
 ## Run locally
 
-1. Install Node.js 20.9 or newer.
-2. Copy `.env.example` to `.env.local` and generate a private authentication secret:
+1. Install Node.js 22 or newer.
+2. Create a PostgreSQL database in Neon, copy its pooled connection string to `DATABASE_URL` in `.env.local`, and generate a private authentication secret:
 	```sh
 	node -e "console.log(require('node:crypto').randomBytes(32).toString('base64url'))"
 	```
 	Put the generated value in `AUTH_SECRET`. Never commit `.env.local` or share the generated secret.
-3. Run `npm install` and then `npm run dev` from this directory.
+3. Run `npm install` and then `npm run dev` from this directory. The application creates its PostgreSQL tables when first used.
 4. Open `http://localhost:3000`.
 
-The app creates `data/auth.sqlite` for local accounts. Passwords are bcrypt-hashed; the session is a signed, seven-day `HttpOnly`, `SameSite=Lax` cookie. The database and `.env*` files are ignored by Git.
+Passwords are bcrypt-hashed; the session is a signed, seven-day `HttpOnly`, `SameSite=Lax` cookie. Keep `.env.local` private and never commit or share its secrets.
 
 For production, use HTTPS, a stable private `AUTH_SECRET`, persistent database storage, and a shared rate limiter/WAF in front of every app instance. The built-in rate limit is process-local and is not sufficient by itself for a multi-instance public deployment. Public account registration requires email verification followed by administrator approval. Password reset is not implemented.
 
@@ -25,28 +25,32 @@ The analysis area includes a disabled-by-default Binance Futures Testnet EA, plu
 
 ## Member administration
 
-The first administrator must be bootstrapped from a trusted shell on the server that has access to the production auth database:
+The first administrator must be bootstrapped from a trusted shell connected to the same Neon database as the app:
 
 1. Register the administrator's email through the app and complete email verification. Do not share the password or server credentials.
-2. From this project directory, run `npm run admin:bootstrap -- admin@example.com`. Ensure `AUTH_DB_PATH` points to the production database for this shell; otherwise the command uses `data/auth.sqlite`.
+2. From this project directory, set `DATABASE_URL` to that database's pooled connection string, then run `npm run admin:bootstrap -- admin@example.com`.
 3. Sign in with that account and open **គ្រប់គ្រងសមាជិក** from the dashboard sidebar, or visit `/admin/members`.
 
 The bootstrap command only works while no administrator exists. It approves and enables the matching registered account and grants its admin role; it cannot be used to add more admins. Keep server-shell access restricted. Admins can approve or reject pending registrations and disable or re-enable approved member access. Disabled accounts lose access on their next request, including requests using an existing session. Management actions are recorded in the admin audit log.
 
 The member list records a new account's registration IP and updates its last-login IP after successful sign-in. These values are visible only through the admin-only member API and dashboard; accounts registered before this migration have no historical IP values. The application accepts only a valid `x-real-ip` address, so production reverse proxies must overwrite that header with the actual client address. Treat IP addresses as personal data and disclose their collection in the site's privacy notice.
 
-Back up the auth database before production deployment and verify the bootstrap command's environment points at the persistent production database, not a local development copy.
+Back up the database before production deployment and verify the bootstrap command's environment points at the production database, not a local development copy. `npm run db:backup -- ./backups` requires the PostgreSQL `pg_dump` utility; restore backups only into a verified target database.
+
+## Free-tier Vercel + Neon deployment
+
+1. Create a Neon PostgreSQL project and a Vercel project connected to this GitHub repository. Use the repository root as the Vercel project root; it contains `package.json`.
+2. In Vercel project settings, add `DATABASE_URL` using Neon's pooled connection string, `AUTH_SECRET` (at least 32 bytes), and `EXCHANGE_ENCRYPTION_KEY` (64 hex characters). Add `APP_BASE_URL` as the deployed HTTPS origin plus the email provider variables (`RESEND_API_KEY`, verified `APPROVAL_EMAIL_FROM`, and `APPROVAL_ADMIN_EMAIL`). Add market/AI/payment variables only for services you have configured. Never put secrets in `NEXT_PUBLIC_` variables or chat.
+3. Deploy, open `/api/health`, and confirm it returns `{"status":"ok"}`. Register and verify the first admin email, then run the bootstrap command from a trusted local shell with `DATABASE_URL` set to the same Neon project.
+4. Sign in, review the member/admin controls, and test registration/approval and email delivery. Keep an offsite database backup and review Neon/Vercel usage limits before inviting members. A fresh Neon database starts empty; the previous local SQLite accounts and data are not migrated automatically.
+
+Vercel's serverless functions do not run the app's long-lived polling worker: automatic EA operation is intentionally unavailable there and the API refuses to enable it. Binance Futures remains Testnet-only. Forex signals require a secured, reachable HTTPS MT5 bridge; `127.0.0.1` inside Vercel is not the user's/local bridge. Vercel's request-size and execution limits also do not support the 250 MB dubbing workflow; use a separate VM/background worker and object storage for that feature.
 
 ## Docker / single-VM deployment
 
-The supplied `compose.yaml` runs one Next.js application container with a persistent SQLite volume and a Caddy reverse proxy for HTTPS. Point the domain's DNS A/AAAA records at the VM, allow inbound ports 80 and 443, and install Docker Engine with the Compose plugin.
+The supplied `compose.yaml` can still run one Next.js container and Caddy, but the app now requires external PostgreSQL. Provide `DATABASE_URL` and the same required secrets in `.env.production`; the old SQLite volume is not used. Configure DNS, HTTPS, and firewall rules as described for your VM provider. Run `npm run admin:bootstrap -- <registered-email>` in a trusted environment connected to the production database. For backups, use a recent PostgreSQL client and Neon’s unpooled URL (`DATABASE_URL_UNPOOLED`); store dumps offsite and test restores.
 
-1. Copy `.env.production.example` to `.env.production` on the VM. Set `APP_DOMAIN`, `APP_BASE_URL`, a unique `AUTH_SECRET` (at least 32 bytes), `APPROVAL_ADMIN_EMAIL`, a verified Resend sender and `RESEND_API_KEY`. Set `EXCHANGE_ENCRYPTION_KEY` before saving any exchange credentials. Configure Gemini and market-provider keys only for features you will operate. Do not copy `.env.local` or commit `.env.production`.
-2. Start from the project directory with `docker compose --env-file .env.production up -d --build`. Confirm `docker compose --env-file .env.production ps` reports both services healthy. Caddy obtains and renews the HTTPS certificate; the app port is intentionally not exposed directly.
-3. Register the administrator's email through the public form and verify it from its inbox. From an authorized server shell run `docker compose --env-file .env.production exec app npm run admin:bootstrap -- admin@example.com`. Replace the example with the same registered email. This command uses the container's persistent production database.
-4. Create a database backup with `docker compose --env-file .env.production exec app npm run db:backup -- /backups`. The named backup volume is on the same VM and is not disaster recovery: copy encrypted backups offsite, limit access, define a retention period, and test restoration before launch.
-
-Public registration remains subject to administrator approval. The production database and Caddy certificate state persist in Docker volumes. Use one application instance with this SQLite setup; do not horizontally scale it. The in-memory rate limiter is process-local, so multi-instance deployments need shared rate limiting/WAF and a shared production database. The local MT5 bridge URL does not connect to a bridge inside this container; configure a secured reachable HTTPS bridge only if needed. ABA payments remain in sandbox until the bank authorizes live credentials and a production transaction test. The 250 MB media feature needs a VM with adequate memory, disk, bandwidth, and a tested backup/cleanup process.
+The in-memory rate limiter is process-local; use a shared rate limiter/WAF for a multi-instance public deployment. ABA payments remain in sandbox until the bank authorizes live credentials and a production transaction test.
 
 Do not announce a public launch until the privacy-notice draft at `/privacy` is reviewed and finalized by the service operator, registration/approval and email delivery are tested, an administrator is bootstrapped, offsite backups are verified, provider quotas and billing are understood, and DNS/TLS/restore procedures have been exercised. This checklist is operational guidance, not a legal or security certification.
 

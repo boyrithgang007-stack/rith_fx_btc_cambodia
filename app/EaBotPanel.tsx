@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 type Settings = { symbol: string; capitalUsd: number; riskPercent: number; leverage: number; enabled: boolean; updatedAt: string | null };
 type Run = { symbol: string; candleTime: number; status: string; message: string; orderId: string | null; createdAt: string };
 type Audit = { action: string; createdAt: string };
-type Snapshot = { settings: Settings; encryptionConfigured: boolean; credentialsConfigured: boolean; testnetVerified: boolean; runs: Run[]; audit: Audit[] };
+type Snapshot = { settings: Settings; automationAvailable: boolean; encryptionConfigured: boolean; credentialsConfigured: boolean; testnetVerified: boolean; runs: Run[]; audit: Audit[] };
 
 const initialSettings: Settings = { symbol: "BTCUSDT", capitalUsd: 100, riskPercent: 1, leverage: 3, enabled: false, updatedAt: null };
 
@@ -81,13 +81,14 @@ export default function EaBotPanel() {
   return <section className="ea-bot" aria-labelledby="ea-bot-title">
     <div className="ea-bot-heading">
       <div><p className="eyebrow">BINANCE USDⓈ-M FUTURES · AUTOMATION</p><h3 id="ea-bot-title">EA Bot · Testnet</h3></div>
-      <span className={settings.enabled && snapshot?.testnetVerified ? "ea-state ea-state-on" : "ea-state"}>{settings.enabled && snapshot?.testnetVerified ? "TESTNET RUNNING" : "DISABLED"}</span>
+      <span className={settings.enabled && snapshot?.testnetVerified && snapshot?.automationAvailable ? "ea-state ea-state-on" : "ea-state"}>{settings.enabled && snapshot?.testnetVerified && snapshot?.automationAvailable ? "TESTNET RUNNING" : settings.enabled && !snapshot?.automationAvailable ? "WORKER UNAVAILABLE" : "DISABLED"}</span>
     </div>
     <p className="ea-bot-notice">ដំណាក់កាលនេះប្រើ Testnet ប៉ុណ្ណោះ — មិនអាចដាក់ order លើគណនីពិតបានទេ។ Live mode ត្រូវការការសាកល្បង Testnet និងការបើកដោយដៃដាច់ដោយឡែក។ Futures មានហានិភ័យខ្ពស់ ហើយអាចបាត់បង់ដើមទុនទាំងស្រុង។</p>
     {!loading && <div className="ea-readiness" aria-label="ស្ថានភាពត្រៀមប្រើ EA">
       <span className={snapshot?.encryptionConfigured ? "ready" : "missing"}>{snapshot?.encryptionConfigured ? "✓ Server encryption ready" : "× Server encryption missing"}</span>
       <span className={snapshot?.credentialsConfigured ? "ready" : "missing"}>{snapshot?.credentialsConfigured ? "✓ Testnet key saved" : "× Testnet key not connected"}</span>
       <span className={snapshot?.testnetVerified ? "ready" : "missing"}>{snapshot?.testnetVerified ? "✓ Testnet verified" : "× Testnet not verified"}</span>
+      {!snapshot?.automationAvailable && <span className="missing">× Vercel cannot run the continuous EA worker</span>}
     </div>}
     {error && <p className="ea-message ea-error" role="alert">{error}</p>}
     {message && <p className="ea-message" role="status">{message}</p>}
@@ -108,7 +109,7 @@ export default function EaBotPanel() {
         <p>{snapshot?.credentialsConfigured ? snapshot.testnetVerified ? "Testnet account verified · credentials encrypted on this server." : "Testnet key saved but requires verification." : "បញ្ចូល API key/secret របស់ Binance Futures Testnet។ កុំប្រើ API key គណនីពិត ឬបើក withdrawal permission។"}</p>
       </div>
       <div className="ea-footer">
-        <label className="ea-toggle"><input type="checkbox" checked={settings.enabled} disabled={busy || (!snapshot?.credentialsConfigured && !(apiKey && apiSecret)) || (settings.enabled && !snapshot?.testnetVerified)} onChange={event => setSettings(current => ({ ...current, enabled: event.target.checked }))} /> បើក automatic Testnet EA</label>
+        <label className="ea-toggle"><input type="checkbox" checked={settings.enabled} disabled={busy || (!snapshot?.automationAvailable && !settings.enabled) || (!snapshot?.credentialsConfigured && !(apiKey && apiSecret)) || (settings.enabled && !snapshot?.testnetVerified)} onChange={event => setSettings(current => ({ ...current, enabled: event.target.checked }))} /> បើក automatic Testnet EA</label>
         <div><ControlButton type="submit" disabled={busy}>{busy ? "កំពុងផ្ទៀងផ្ទាត់…" : "រក្សាទុក / ផ្ទៀងផ្ទាត់"}</ControlButton>
           {snapshot?.credentialsConfigured && <ControlButton type="button" variant="danger" disabled={busy} onClick={() => void disconnect()}>ដក Testnet key</ControlButton>}
         </div>

@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { allowAuthAttempt, database, getCurrentUser } from "@/app/lib/auth";
+import { allowAuthAttempt, getCurrentUser } from "@/app/lib/auth";
 import {
   addPublicSocialLink,
   listPublicSocialLinks,
@@ -21,7 +21,7 @@ async function requireAdmin() {
 }
 
 export async function GET() {
-  return Response.json({ links: listPublicSocialLinks(database) }, { headers: { "Cache-Control": "no-store" } });
+  return Response.json({ links: await listPublicSocialLinks() }, { headers: { "Cache-Control": "no-store" } });
 }
 
 export async function POST(request: Request) {
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
   const body = await readAuthJson(request);
   if (!body) return authJson("ទិន្នន័យសំណើមិនត្រឹមត្រូវទេ។", 400);
   try {
-    const link = addPublicSocialLink(database, body.platform, body.url, randomUUID);
+    const link = await addPublicSocialLink(body.platform, body.url, randomUUID);
     return Response.json({ link }, { status: 201, headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     if (error instanceof PublicSocialLinkError) return authJson(error.message, error.status);
@@ -47,7 +47,7 @@ export async function DELETE(request: Request) {
   const body = await readAuthJson(request);
   if (!body) return authJson("ទិន្នន័យសំណើមិនត្រឹមត្រូវទេ។", 400);
   try {
-    const result = removePublicSocialLink(database, body.id);
+    const result = await removePublicSocialLink(body.id);
     return Response.json({ result }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     if (error instanceof PublicSocialLinkError) return authJson(error.message, error.status);

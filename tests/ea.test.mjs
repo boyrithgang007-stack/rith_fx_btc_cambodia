@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import ts from 'typescript';
+import { createDatabase, databaseAdapter } from './helpers/database-adapter.mjs';
 
 const require = createRequire(import.meta.url);
 function load(file, deps = {}) {
@@ -16,14 +17,9 @@ function load(file, deps = {}) {
 
 process.env.EXCHANGE_ENCRYPTION_KEY = '42'.repeat(32);
 const vault = load('app/lib/exchanges/vault.ts');
-const Database = require('better-sqlite3');
-const authDb = new Database(':memory:');
-authDb.exec(`CREATE TABLE users (
-  id TEXT PRIMARY KEY, status TEXT NOT NULL DEFAULT 'approved',
-  access_enabled INTEGER NOT NULL DEFAULT 1, email_verified INTEGER NOT NULL DEFAULT 1
-);
-INSERT INTO users (id) VALUES ('alice'), ('bob');`);
-const store = load('app/lib/ea/store.ts', { '../auth': { database: authDb }, '../exchanges/vault': vault });
+const authDb = createDatabase();
+authDb.exec("INSERT INTO users (id,email,password_hash) VALUES ('alice','alice@example.com','x'),('bob','bob@example.com','x')");
+const store = load('app/lib/ea/store.ts', { '../database': databaseAdapter(authDb), '../exchanges/vault': vault });
 const futures = load('app/lib/ea/binance-futures.ts');
 const strategy = load('app/strategy.ts');
 const risk = load('app/lib/ea/risk.ts', { '../../strategy': strategy, './binance-futures': futures });
@@ -31,8 +27,8 @@ const risk = load('app/lib/ea/risk.ts', { '../../strategy': strategy, './binance
 const credentials = { apiKey: 'a'.repeat(32), apiSecret: 'b'.repeat(32) };
 const settings = { symbol: 'BTCUSDT', capitalUsd: 1000, riskPercent: 1, leverage: 5, enabled: false };
 
-test('EA settings enforce bounded risk, supported symbols and disabled defaults', () => {
-  assert.deepEqual(store.getEaSettings('alice'), { symbol: 'BTCUSDT', capitalUsd: 100, riskPercent: 1, leverage: 3, enabled: false, updatedAt: null });
+test('EA settings enforce bounded risk, supported symbols and disabled defaults', async () => {
+  assert.deepEqual(await store.getEaSettings('alice'), { symbol: 'BTCUSDT', capitalUsd: 100, riskPercent: 1, leverage: 3, enabled: false, updatedAt: null });
   assert.deepEqual(store.parseEaSettings(settings), settings);
   assert.equal(store.parseEaSettings({ ...settings, riskPercent: 1.1 }), null);
   assert.equal(store.parseEaSettings({ ...settings, leverage: 6 }), null);
@@ -41,21 +37,21 @@ test('EA settings enforce bounded risk, supported symbols and disabled defaults'
   assert.equal(store.parseEaCredentials({ ...credentials, apiSecret: 'short' }), null);
 });
 
-test('EA credentials are encrypted per user and re-keying disables the bot until reverified', () => {
-  store.saveEaSettings('alice', settings, credentials);
-  assert.equal(store.hasEaCredentials('alice'), true);
-  assert.deepEqual(store.getEaCredentials('alice'), credentials);
-  assert.equal(store.getEaCredentials('bob'), null);
+test('EA credentials are encrypted per user and re-keying disables the bot until reverified', async () => {
+  await store.saveEaSettings('alice', settings, credentials);
+  assert.equal(await store.hasEaCredentials('alice'), true);
+  assert.deepEqual(await store.getEaCredentials('alice'), credentials);
+  assert.equal(await store.getEaCredentials('bob'), null);
   const encrypted = authDb.prepare('SELECT encrypted_credentials FROM ea_bot_credentials WHERE user_id=?').get('alice').encrypted_credentials;
   assert.ok(!encrypted.includes(credentials.apiSecret));
-  assert.throws(() => store.saveEaSettings('alice', { ...settings, enabled: true }));
-  store.markEaTestnetVerified('alice');
-  store.saveEaSettings('alice', { ...settings, enabled: true });
-  assert.equal(store.getEaSettings('alice').enabled, true);
-  store.saveEaSettings('alice', settings, { ...credentials, apiSecret: 'c'.repeat(32) });
-  assert.equal(store.getEaSettings('alice').enabled, false);
-  assert.equal(store.isEaTestnetVerified('alice'), false);
-  assert.equal(store.listEnabledEaUsers().length, 0);
+  await assert.rejects(store.saveEaSettings('alice', { ...settings, enabled: true }));
+  await store.markEaTestnetVerified('alice');
+  await store.saveEaSettings('alice', { ...settings, enabled: true });
+  assert.equal((await store.getEaSettings('alice')).enabled, true);
+  await store.saveEaSettings('alice', settings, { ...credentials, apiSecret: 'c'.repeat(32) });
+  assert.equal((await store.getEaSettings('alice')).enabled, false);
+  assert.equal(await store.isEaTestnetVerified('alice'), false);
+  assert.equal((await store.listEnabledEaUsers()).length, 0);
 });
 
 test('Binance Futures requests are pinned to Testnet and sign private calls', async () => {

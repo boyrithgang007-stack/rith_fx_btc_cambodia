@@ -17,11 +17,8 @@ WORKDIR /app
 ENV NODE_ENV=production \
   NEXT_TELEMETRY_DISABLED=1 \
   HOSTNAME=0.0.0.0 \
-  PORT=3000 \
-  AUTH_DB_PATH=/app/data/auth.sqlite
+  PORT=3000
 COPY --from=builder --chown=node:node /app ./
-RUN mkdir -p /app/data /backups \
-  && chown node:node /app/data /backups
 USER node
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \

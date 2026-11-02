@@ -14,7 +14,7 @@ export async function GET(request: Request, context: Context) {
   if (!allowAuthAttempt(`balance:${user.id}`, 10, 60000)) return authJson("Refresh limit reached. Retry in one minute.", 429);
   try {
     const { id } = await context.params;
-    const credentials = connectionCredentials(user.id, id);
+    const credentials = await connectionCredentials(user.id, id);
     if (!credentials) return authJson("Connection not found.", 404);
     return Response.json(await readAccount(credentials), { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
@@ -27,6 +27,6 @@ export async function DELETE(request: Request, context: Context) {
   const user = await getCurrentUser();
   if (!user) return authJson("Please sign in to an approved account.", 401);
   const { id } = await context.params;
-  if (!removeConnection(user.id, id)) return authJson("Connection not found.", 404);
+  if (!await removeConnection(user.id, id)) return authJson("Connection not found.", 404);
   return Response.json({ disconnected: true }, { headers: { "Cache-Control": "no-store" } });
 }

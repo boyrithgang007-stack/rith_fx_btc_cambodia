@@ -39,19 +39,19 @@ export async function POST(request: Request) {
   try {
     assertAuthConfigured();
     const config = approvalMailConfig();
-    const existing = getUserByEmail(email);
+    const existing = await getUserByEmail(email);
     if (existing && (existing.status !== "pending" || !(await verifyPassword(password, existing.password_hash)))) {
       return authJson("មិនអាចប្រើអ៊ីមែលនេះបានទេ។ ប្រសិនបើមានគណនី សូមចូលគណនី។", 409);
     }
 
-    const user = existing ?? createUser(email, await hashPassword(password), getClientIp(request), false);
+    const user = existing ?? await createUser(email, await hashPassword(password), getClientIp(request), false);
     if (existing?.email_verified !== 1) {
-      const verification = createEmailVerification(user.id);
+      const verification = await createEmailVerification(user.id);
       try {
         await sendEmailVerificationEmail(user.email, verification.token, verification.hash);
-        markEmailVerificationDelivery(verification.hash, "sent");
+        await markEmailVerificationDelivery(verification.hash, "sent");
       } catch {
-        markEmailVerificationDelivery(verification.hash, "failed");
+        await markEmailVerificationDelivery(verification.hash, "failed");
         return authJson("មិនអាចផ្ញើតំណផ្ទៀងផ្ទាត់អ៊ីមែលបានទេ។ សូមចុះឈ្មោះម្ដងទៀតដោយអ៊ីមែល និងពាក្យសម្ងាត់ដដែល ដើម្បីផ្ញើឡើងវិញ។", 503);
       }
       return Response.json({
@@ -60,12 +60,12 @@ export async function POST(request: Request) {
       }, { status: 202, headers: { "Cache-Control": "no-store" } });
     }
 
-    const review = createApprovalReview(user.id, config.to);
+    const review = await createApprovalReview(user.id, config.to);
     try {
       await sendApprovalEmail(user.email, review.token, review.hash);
-      markApprovalDelivery(review.hash, "sent");
+      await markApprovalDelivery(review.hash, "sent");
     } catch {
-      markApprovalDelivery(review.hash, "failed");
+      await markApprovalDelivery(review.hash, "failed");
       return authJson("អ៊ីមែលរបស់អ្នកបានផ្ទៀងផ្ទាត់ ប៉ុន្តែមិនអាចផ្ញើសំណើទៅអ្នកគ្រប់គ្រងបានទេ។ សូមចុះឈ្មោះម្ដងទៀតដោយព័ត៌មានដដែល ដើម្បីផ្ញើឡើងវិញ។", 503);
     }
     return Response.json({
@@ -76,7 +76,7 @@ export async function POST(request: Request) {
     if (error instanceof AuthConfigurationError || error instanceof ApprovalMailConfigurationError) {
       return authJson("ការចុះឈ្មោះមិនទាន់រួចរាល់ទេ។ អ្នកគ្រប់គ្រងត្រូវកំណត់សេវាអ៊ីមែល និង authentication ជាមុន។", 503);
     }
-    if (error && typeof error === "object" && "code" in error && String(error.code).includes("CONSTRAINT_UNIQUE")) {
+    if (error && typeof error === "object" && "code" in error && error.code === "23505") {
       return authJson("អ៊ីមែលនេះមានសំណើរួចហើយ។ សូមសាកល្បងម្ដងទៀត។", 409);
     }
     return authJson("មិនអាចបង្កើតសំណើបានទេ។ សូមសាកល្បងម្ដងទៀត។", 500);

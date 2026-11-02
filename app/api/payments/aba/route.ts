@@ -9,7 +9,7 @@ export async function GET() {
   if(!user)return authJson("Please sign in to an approved account.",401);
   let configured=false;
   try { paymentConfig(); configured=true; } catch {}
-  return Response.json({configured,payments:listPaymentRecords(user.id)},{headers:{"Cache-Control":"no-store"}});
+  return Response.json({configured,payments:await listPaymentRecords(user.id)},{headers:{"Cache-Control":"no-store"}});
 }
 export async function POST(request: Request) {
   if(!isSameOriginRequest(request))return authJson("Request origin rejected.",403);
@@ -21,12 +21,12 @@ export async function POST(request: Request) {
   const id=randomBytes(10).toString("hex");
   try {
     const config=paymentConfig();
-    createPaymentRecord(id,user.id,amount.amount,amount.currency,config.mode);
+    await createPaymentRecord(id,user.id,amount.amount,amount.currency,config.mode);
     const qr=await createAbaQr(id,amount.amount,amount.currency);
-    setPaymentQr(user.id,id,qr.qrImage);
-    return Response.json({payment:paymentRecord(user.id,id)},{status:201,headers:{"Cache-Control":"no-store"}});
+    await setPaymentQr(user.id,id,qr.qrImage);
+    return Response.json({payment:await paymentRecord(user.id,id)},{status:201,headers:{"Cache-Control":"no-store"}});
   } catch(error) {
-    setPaymentStatus(user.id,id,"failed");
+    await setPaymentStatus(user.id,id,"failed");
     return authJson(error instanceof PaymentConfigurationError ? "The administrator must configure ABA PayWay merchant credentials." : "Unable to generate payment QR. No payment has been confirmed.",error instanceof PaymentConfigurationError ? 503 : 502);
   }
 }

@@ -1,6 +1,6 @@
 # Exchange analytics architecture (phase 1)
 
-This is the initial architecture and read-only adapter contract. It does **not** connect an exchange or broker, store API credentials, fetch private balances, stream live account data, or submit orders. The running application still uses SQLite for authentication; `database/schema.sql` is a PostgreSQL target schema and must not be mistaken for an applied migration.
+This is the initial architecture and read-only analytics adapter contract. The production app now stores its authentication and application data in Neon PostgreSQL; its schema is initialized by `app/lib/database.ts`. `database/schema.sql` remains a separate proposed exchange-analytics schema and is not used by the app. The existing app does connect read-only accounts and store encrypted credentials, but does not implement live Forex execution.
 
 ## Components and data flow
 
@@ -48,9 +48,9 @@ services/
 
 ## PostgreSQL data model
 
-`database/schema.sql` defines users, exchange connections, encrypted credential envelopes, account/balance/position snapshots, historical trades, and audit events. Monetary and quantity values use `NUMERIC`, not floating-point. Snapshot tables are append-only so analytics can compare observations over time. Provider trade IDs are unique per connection for safe upserts.
+`database/schema.sql` defines a future analytics model for users, exchange connections, encrypted credential envelopes, account/balance/position snapshots, historical trades, and audit events. Monetary and quantity values use `NUMERIC`, not floating-point. Snapshot tables are append-only so analytics can compare observations over time. Provider trade IDs are unique per connection for safe upserts.
 
-Before applying this schema, migrate the existing SQLite identity model deliberately: this app currently uses TEXT user IDs and SQLite auth, whereas the proposed target uses UUID users. Do not silently mix the two identity stores.
+This analytics schema is not an application migration. The running app uses TEXT user IDs and the Neon app schema; do not apply the proposed analytics schema as a substitute for that schema or silently mix identity stores.
 
 ## Adapter contract and error policy
 
