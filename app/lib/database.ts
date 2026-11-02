@@ -107,9 +107,13 @@ function getPool() {
   const connectionString = process.env.DATABASE_URL?.trim();
   if (!connectionString) throw new Error("DATABASE_URL is required. Add a Supabase PostgreSQL connection string to the deployment environment.");
   if (!globalThis.__rfxDatabasePool) {
+    const certificateAuthority = process.env.DATABASE_SSL_CA?.trim();
     globalThis.__rfxDatabasePool = new Pool({
       connectionString,
-      ssl: { rejectUnauthorized: true },
+      ssl: {
+        rejectUnauthorized: true,
+        ...(certificateAuthority ? { ca: certificateAuthority } : {}),
+      },
       max: 1,
       idleTimeoutMillis: 10_000,
       connectionTimeoutMillis: 10_000,

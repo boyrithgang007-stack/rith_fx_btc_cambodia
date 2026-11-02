@@ -10,6 +10,7 @@ A Next.js market dashboard with Crypto, Forex reference rates, an FVG paper stra
 	node -e "console.log(require('node:crypto').randomBytes(32).toString('base64url'))"
 	```
 	Put the generated value in `AUTH_SECRET`. Never commit `.env.local` or share the generated secret.
+	If Node.js reports `self-signed certificate in certificate chain`, download the project root certificate from **Supabase → Database → SSL Configuration** and set its PEM contents as `DATABASE_SSL_CA` in `.env.local`. Certificate verification remains enabled.
 3. Run `npm install` and then `npm run dev` from this directory. The application creates its PostgreSQL tables when first used.
 4. Open `http://localhost:3000`.
 
@@ -40,7 +41,7 @@ Back up the database before production deployment and verify the bootstrap comma
 ## Free-tier Vercel + Supabase deployment
 
 1. Create a Supabase project and a Vercel project connected to this GitHub repository. Use the repository root as the Vercel project root; it contains `package.json`.
-2. In Supabase, choose **Connect → Transaction pooler** and copy its connection URI. In Vercel project settings, add that value as `DATABASE_URL`, plus `AUTH_SECRET` (at least 32 bytes) and `EXCHANGE_ENCRYPTION_KEY` (64 hex characters). Add `APP_BASE_URL` as the deployed HTTPS origin plus the email provider variables (`RESEND_API_KEY`, verified `APPROVAL_EMAIL_FROM`, and `APPROVAL_ADMIN_EMAIL`). Add market/AI/payment variables only for services you have configured. Never put secrets in `NEXT_PUBLIC_` variables or chat.
+2. In Supabase, choose **Connect → Transaction pooler** and copy its connection URI. In Vercel project settings, add that value as `DATABASE_URL`, plus `AUTH_SECRET` (at least 32 bytes) and `EXCHANGE_ENCRYPTION_KEY` (64 hex characters). If the runtime reports a certificate-chain error, add the PEM contents of the root certificate from **Supabase ? Database ? SSL Configuration** as `DATABASE_SSL_CA`. Add `APP_BASE_URL` as the deployed HTTPS origin plus the email provider variables (`RESEND_API_KEY`, verified `APPROVAL_EMAIL_FROM`, and `APPROVAL_ADMIN_EMAIL`). Add market/AI/payment variables only for services you have configured. Never put secrets in `NEXT_PUBLIC_` variables or chat.
 3. Deploy, open `/api/health`, and confirm it returns `{"status":"ok"}`. Register and verify the first admin email, then run the bootstrap command from a trusted local shell with `DATABASE_URL` set to the same Supabase project.
 4. Sign in, review the member/admin controls, and test registration/approval and email delivery. Keep an offsite database backup and review Supabase/Vercel usage limits before inviting members. A fresh database starts empty; the previous local SQLite accounts and data are not migrated automatically.
 
