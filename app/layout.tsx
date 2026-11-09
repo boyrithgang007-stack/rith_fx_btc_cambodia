@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
+import StartupLoader from "./StartupLoader";
+import RfxAssistant from "./RfxAssistant";
 import "./globals.css";
 import "./loading.css";
+import "./rfx-loading.css";
 import "./responsive-experience.css";
 import "./desktop-experience.css";
 import "./connections.css";
@@ -36,17 +39,19 @@ import "./neon-card-borders.css";
 import "./dashboard-finance-theme.css";
 import "./auth-experience.css";
 import "./ea-bot.css";
+import "./mobile-workspace.css";
+import "./rfx-assistant.css";
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#ffffff" };
 
 export const metadata: Metadata = {
-  title: "RITH FX BTC Cambodia | Market Observatory",
+  title: "RFX BTC TEAM Cambodia | Market Observatory",
   description: "Forex, Binance, gold, silver and oil market reference and analysis tools.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="km">
-      <body>{children}</body>
+      <body><StartupLoader/>{children}<RfxAssistant/></body>
     </html>
   );
 }

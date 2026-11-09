@@ -1,0 +1,95 @@
+/* Final touch layout owner; public landing and desktop retain their own styles. */
+@media (max-width:760px) {
+  /* Retire legacy desktop flex/grid and full-viewport sizing on touch screens. */
+  .market-app:is(.theme-light,.theme-dark) .dashboard-sidebar.workspace-sidebar {
+    display:block!important; position:relative!important; inset:auto!important;
+    height:auto!important; min-height:0!important; max-height:none!important;
+    align-self:start!important; grid-template-columns:1fr!important; flex-direction:column!important;
+    justify-content:flex-start!important; align-items:stretch!important;
+  }
+  .market-app:is(.theme-light,.theme-dark) .dashboard-sidebar.workspace-sidebar>:not(.market-brand) { display:none!important; }
+  .market-app:is(.theme-light,.theme-dark) .dashboard-sidebar.workspace-sidebar>.market-brand {
+    display:flex!important; margin:0!important; padding:8px 10px!important;
+    min-height:64px!important; height:auto!important; width:100%!important;
+    justify-content:flex-start!important; align-items:center!important; box-sizing:border-box;
+  }
+  .market-app:is(.theme-light,.theme-dark) .dashboard-sidebar.workspace-sidebar .market-brand-logo { width:72px!important; height:auto!important; }
+  .market-app:is(.theme-light,.theme-dark) { display:block!important; grid-template-columns:minmax(0,1fr)!important; }
+  .market-app:is(.theme-light,.theme-dark)>.dashboard-workspace { width:100%!important; margin:0!important; min-width:0; }
+  .market-app:is(.theme-light,.theme-dark) .dashboard-sidebar.workspace-sidebar {
+    position:relative; top:auto; height:auto; min-height:0; max-height:none; width:100%;
+    display:block; padding:12px; margin:0 0 12px; box-sizing:border-box; overflow:hidden;
+  }
+  .market-app:is(.theme-light,.theme-dark) .workspace-sidebar>.market-brand {
+    display:flex; align-items:center; justify-content:flex-start; gap:14px; padding:0; margin:0;
+    width:100%; height:auto; min-height:0; max-height:none;
+  }
+  .market-app:is(.theme-light,.theme-dark) .workspace-sidebar .market-brand-logo { width:90px; height:auto; flex:none; border-radius:10px; }
+  .market-app:is(.theme-light,.theme-dark) .workspace-sidebar .market-brand-caption { display:grid; gap:5px; min-width:0; }
+  .market-app:is(.theme-light,.theme-dark) .workspace-sidebar .market-brand strong { font-size:15px; line-height:1.5; }
+  .market-app:is(.theme-light,.theme-dark) .workspace-sidebar .market-brand small { font-size:8px; line-height:1.7; letter-spacing:.8px; }
+  .market-app:is(.theme-light,.theme-dark) .workspace-sidebar>:is(.sidebar-label,.sidebar-nav,.sidebar-bottom) { display:none; }
+  .market-app:is(.theme-light,.theme-dark) .market-header { position:relative; top:auto; height:auto; min-height:0; margin:0 0 12px; padding:12px; display:flex; flex-direction:column; align-items:stretch; gap:10px; }
+  .market-app:is(.theme-light,.theme-dark) .header-title { display:flex; flex-wrap:wrap; gap:8px; font-size:11px; }
+  .market-app:is(.theme-light,.theme-dark) .header-actions { display:flex; width:100%; flex-wrap:wrap; gap:8px; margin:0; }
+  .market-app:is(.theme-light,.theme-dark) .header-actions>.theme-toggle { display:inline-flex; }
+  .market-app:is(.theme-light,.theme-dark) .header-actions>:is(.support-button,.logout-button) { display:inline-flex; justify-content:center; align-items:center; flex:1; min-height:46px; padding:8px 12px; font-size:12px; }
+  .market-app:is(.theme-light,.theme-dark) .header-actions>.refresh-button { flex:1 1 100%; width:100%; }
+  .market-app.cinematic-terminal:is(.theme-light,.theme-dark) {
+    display:block; width:100%; min-width:0; padding:10px 10px calc(112px + env(safe-area-inset-bottom));
+  }
+  .market-app:is(.theme-light,.theme-dark) :is(.dashboard-workspace,.market-content,.terminal-dashboard,.panel,.candle-signal-desk,.research-workbench) {
+    min-width:0; max-width:100%; box-sizing:border-box;
+  }
+  .market-app.cinematic-terminal:is(.theme-light,.theme-dark) .market-header {
+    position:relative; top:auto; height:auto; width:100%; padding:12px; gap:12px; flex-wrap:wrap;
+  }
+  .market-app.cinematic-terminal:is(.theme-light,.theme-dark) .header-actions {
+    display:flex; flex-wrap:wrap; width:100%; margin:0; gap:8px;
+  }
+  .market-app .header-actions>* { min-width:0; max-width:100%; }
+  .market-app .header-search { width:100%; flex:1 1 100%; }
+  .market-app:is(.theme-light,.theme-dark) :is(input:not([type=checkbox]):not([type=radio]),select,textarea) {
+    font-size:16px; min-height:48px; max-width:100%; box-sizing:border-box;
+  }
+  .market-app:is(.theme-light,.theme-dark) [data-ui-control] {
+    min-height:48px!important; height:auto; min-width:48px; max-width:100%;
+    white-space:normal; overflow-wrap:anywhere; line-height:1.7!important;
+    padding:10px 14px!important; touch-action:manipulation;
+  }
+  .market-app:is(.theme-light,.theme-dark) [data-ui-size="icon"] { width:48px; flex-shrink:0; }
+  .market-app :is(.candle-desk-controls,.research-toolbar) {
+    display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; align-items:end;
+  }
+  .market-app :is(.candle-desk-controls,.research-toolbar)>label { min-width:0; max-width:none; width:100%; }
+  .market-app :is(.candle-desk-controls,.research-toolbar)>button { grid-column:1/-1; width:100%; }
+  .market-app .research-toolbar>label { grid-column:1/-1; }
+  .market-app .signal-chart-tabs { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  .market-app .signal-chart-tabs>button { width:100%; min-width:0; }
+  .market-app .image-analysis-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .market-app .image-analysis-actions>span { grid-column:1/-1; line-height:1.8; }
+  .market-app .image-analysis-actions>:is(label,button) { width:100%; min-width:0; text-align:center; }
+  .market-app .image-analysis-panel>button { width:100%; }
+  .market-app :is(.candle-signal-desk,.research-workbench,.image-analysis-panel,.image-analysis-result,.signal-report,.ai-candle-review) {
+    padding:16px; border-radius:18px;
+  }
+  .market-app .signal-report-levels { grid-template-columns:1fr; gap:10px; }
+  .market-app .signal-report-levels>div { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:12px; padding:16px; }
+  .market-app .signal-report-levels strong { margin:0; font-size:21px; }
+  .market-app .signal-connection-status { display:grid; gap:8px; overflow-wrap:anywhere; }
+  .market-app :is(.signal-history-item,.signal-meta,.signal-report p,.image-analysis-result) { overflow-wrap:anywhere; }
+  .market-app :is(.signal-history summary,.image-analysis-result summary,.research-method summary) { min-height:44px; display:list-item; align-content:center; }
+  .market-app .tv-chart-host { height:clamp(340px,60svh,480px); }
+  .market-app .signal-ohlc-chart { overflow-x:auto; overscroll-behavior-x:contain; padding:12px; }
+  .market-app .signal-ohlc-chart svg { width:760px; max-width:none; min-height:270px; }
+  .market-app .image-analysis-facts { grid-template-columns:1fr; }
+  .market-app .research-grid { grid-template-columns:1fr; gap:16px; }
+}
+@media(max-width:380px) {
+  .market-app .candle-desk-controls { grid-template-columns:1fr; }
+  .market-app .signal-chart-tabs,.market-app .image-analysis-actions { grid-template-columns:1fr; }
+  .market-app .signal-report-levels>div { grid-template-columns:1fr; gap:6px; }
+}
+@media(hover:none) and (pointer:coarse) {
+  .market-app [data-ui-control]:hover { transform:none; }
+}

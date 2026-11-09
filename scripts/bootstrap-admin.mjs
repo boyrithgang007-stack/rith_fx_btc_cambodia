@@ -11,15 +11,7 @@ if (process.argv.length !== 3 || !email || email.length > 254 || !/^[^\s@]+@[^\s
   console.error("DATABASE_URL is required. Add the Supabase pooler connection string to .env.local or the deployment environment.");
   process.exitCode = 1;
 } else {
-  const certificateAuthority = process.env.DATABASE_SSL_CA?.trim();
-  const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-      rejectUnauthorized: true,
-      ...(certificateAuthority ? { ca: certificateAuthority } : {}),
-    },
-    max: 1,
-  });
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 1 });
   let client;
   try {
     client = await pool.connect();

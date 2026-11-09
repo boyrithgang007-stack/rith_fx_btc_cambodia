@@ -81,7 +81,7 @@ export async function sendEmailVerificationEmail(email: string, token: string, r
   const message = {
     from: config.from,
     to: [email],
-    subject: "RITH FX BTC Cambodia — Verify your email",
+    subject: "RFX BTC TEAM Cambodia — Verify your email",
     text: `Confirm that you own this email address to continue your membership request:\n${url}\n\nThis private link expires in 24 hours and can be used once. If you did not request an account, you can ignore this message.`,
   };
   try {

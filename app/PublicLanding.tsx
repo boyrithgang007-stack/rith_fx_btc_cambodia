@@ -23,7 +23,7 @@ export default function PublicLanding({ signedIn, isAdmin, adminAvatar, activeMe
   return <main className={`welcome-page theme-${theme}`} id="top" lang={language}>
     <a href="#welcome-main" className="welcome-skip">{km?"ទៅមាតិកា":"Skip to content"}</a>
     <header className="welcome-nav">
-      <Link className="welcome-brand" href="/" aria-label="RITH FX BTC Cambodia home">RITH<span>FX BTC CAMBODIA</span><i aria-hidden="true">✳</i></Link>
+      <Link className="welcome-brand" href="/" aria-label="RFX BTC TEAM Cambodia home">RFX<span>BTC TEAM · CAMBODIA</span><i aria-hidden="true">✳</i></Link>
       <div className="welcome-admin-contact" aria-label={km?"ទំនាក់ទំនងអ្នកគ្រប់គ្រង":"Contact the administrator"}>
         <a href="mailto:rithbtccambodia@gmail.com?subject=RITH%20FX%20BTC%20Administrator" aria-label={km?"ផ្ញើអ៊ីមែលទៅអ្នកគ្រប់គ្រង":"Email the administrator"}><span aria-hidden="true">✉</span><span>{km?"អ៊ីមែល":"Email"}</span></a>
         <a href="https://t.me/RFX_BTC_analyze" target="_blank" rel="noopener noreferrer" aria-label={km?"ចូលរួមសហគមន៍ Telegram":"Join the Telegram community"}><span aria-hidden="true">➤</span><span>Telegram</span></a>
@@ -41,9 +41,9 @@ export default function PublicLanding({ signedIn, isAdmin, adminAvatar, activeMe
       </div>
     </section>
     <section className="welcome-hero" id="welcome-main" aria-labelledby="welcome-title">
-      <div className="welcome-hero-copy"><p className="welcome-kicker">INDEPENDENT MARKET WORKSPACE</p><h1 id="welcome-title"><span>RITH</span><span>FX BTC<span className="welcome-title-dot">.</span></span></h1>
+      <div className="welcome-hero-copy"><p className="welcome-kicker">INDEPENDENT MARKET WORKSPACE</p><h1 id="welcome-title"><span>RFX</span><span>BTC TEAM<span className="welcome-title-dot">.</span></span></h1>
         <ul className="welcome-hero-facts"><li>BASED IN CAMBODIA</li><li>FOREX, CRYPTO & COMMODITIES</li><li>RESEARCH. CONTEXT. CLARITY.</li></ul>
-        <p className="welcome-intro">{km?"សូមស្វាគមន៍មកកាន់ RITH FX BTC។ កន្លែងតែមួយសម្រាប់តាមដានទីផ្សារ និងស្វែងយល់ពីទិន្នន័យ។":"Welcome to RITH FX BTC. A personal workspace for following markets and understanding the data."}</p>
+        <p className="welcome-intro">{km?"សូមស្វាគមន៍មកកាន់ RFX BTC TEAM។ កន្លែងតែមួយសម្រាប់តាមដានទីផ្សារ និងស្វែងយល់ពីទិន្នន័យ។":"Welcome to RFX BTC TEAM. A personal workspace for following markets and understanding the data."}</p>
         <Link href="/dashboard" className="welcome-primary">{action}<span>↗</span></Link>
         <Link href="/learn" className="welcome-learn-link">{km?"សិក្សាទីផ្សារ →":"Learn the markets →"}</Link>
         <div className="welcome-member-proof" aria-label={km?`${activeMemberCount} គណនីបានអនុម័ត និងកំពុងប្រើ`:`${activeMemberCount} approved active accounts`}>
@@ -63,9 +63,9 @@ export default function PublicLanding({ signedIn, isAdmin, adminAvatar, activeMe
       </aside>
       <div className="welcome-hero-foot"><a href="#about" className="welcome-scroll"><span>↓</span><small>SCROLL DOWN<br/>TO EXPLORE</small></a><span>FOREX / CRYPTO / METALS / ENERGY</span></div>
     </section>
-    <div className="welcome-ticker" aria-hidden="true"><span>FOREX <i>✳</i> CRYPTO <i>✳</i> GOLD <i>✳</i> SILVER <i>✳</i> OIL <i>✳</i> RITH FX BTC <i>✳</i></span></div>
+    <div className="welcome-ticker" aria-hidden="true"><span>FOREX <i>✳</i> CRYPTO <i>✳</i> GOLD <i>✳</i> SILVER <i>✳</i> OIL <i>✳</i> RFX BTC TEAM <i>✳</i></span></div>
     <MarketTicker/>
-    <section className="welcome-about" id="about"><div className="welcome-section-label"><span>01 / ABOUT</span><i>↘</i></div><div><p className="welcome-kicker">ONE WORKSPACE. CONNECTED MARKETS.</p><h2>{km?<>មើលទីផ្សារ។<br/><em>យល់ពីទិន្នន័យ។</em></>:<>Follow the markets.<br/><em>Keep the context.</em></>}</h2><p className="welcome-body">{km?"RITH FX BTC Cambodia រួមបញ្ចូល Forex, Crypto, មាស ប្រាក់ និងប្រេង ជាមួយក្រាប និងឧបករណ៍វិភាគ។ ពិនិត្យប្រភព និងពេលវេលាទិន្នន័យ ដើម្បីមើលទីផ្សារបានកាន់តែច្បាស់។":"RITH FX BTC Cambodia brings together Forex, crypto, metals and energy with charts and research tools. See the source and reference date behind the data."}</p><Link href="/dashboard" className="welcome-text-link">{action} <span>↗</span></Link></div></section>
+    <section className="welcome-about" id="about"><div className="welcome-section-label"><span>01 / ABOUT</span><i>↘</i></div><div><p className="welcome-kicker">ONE WORKSPACE. CONNECTED MARKETS.</p><h2>{km?<>មើលទីផ្សារ។<br/><em>យល់ពីទិន្នន័យ។</em></>:<>Follow the markets.<br/><em>Keep the context.</em></>}</h2><p className="welcome-body">{km?"RFX BTC TEAM Cambodia រួមបញ្ចូល Forex, Crypto, មាស ប្រាក់ និងប្រេង ជាមួយក្រាប និងឧបករណ៍វិភាគ។ ពិនិត្យប្រភព និងពេលវេលាទិន្នន័យ ដើម្បីមើលទីផ្សារបានកាន់តែច្បាស់។":"RFX BTC TEAM Cambodia brings together Forex, crypto, metals and energy with charts and research tools. See the source and reference date behind the data."}</p><Link href="/dashboard" className="welcome-text-link">{action} <span>↗</span></Link></div></section>
     <section className="welcome-markets" id="markets" aria-labelledby="welcome-market-title"><div className="welcome-section-label"><span>02 / THE WORKSPACE</span><span>FOUR WAYS TO EXPLORE</span></div><h2 id="welcome-market-title">{km?"ស្វែងយល់ពីទីផ្សារ":"Explore the workspace"}<span className="welcome-small-star" aria-hidden="true">✳</span></h2><div className="welcome-project-grid">{features.map(feature=><Link href={feature.href} key={feature.number} className="welcome-project"><div className={`welcome-project-art welcome-art-${feature.style}`} aria-hidden="true"><span className="welcome-art-index">{feature.number} / RFX</span><b>{feature.mark}</b><span className="welcome-art-orbit"/><span className="welcome-art-orbit welcome-art-orbit-two"/><span className="welcome-art-caption">{feature.category}</span></div><div className="welcome-project-heading"><h3>{feature.title}</h3><span>↗</span></div><p>{feature.text}</p><span className="welcome-project-action">{km?"បើកមើល":"EXPLORE"} ↗</span></Link>)}</div></section>
     <BloombergNews language={language}/>
     <section className="welcome-final" id="workspace">
@@ -87,7 +87,7 @@ export default function PublicLanding({ signedIn, isAdmin, adminAvatar, activeMe
         </div>
       </aside>
     </section>
-    <footer className="welcome-footer"><Link href="/" className="welcome-brand">RITH<span>FX BTC CAMBODIA</span></Link><span>MARKET RESEARCH · NO BROKER EXECUTION</span><a href="#top">BACK TO TOP ↑</a></footer>
+    <footer className="welcome-footer"><Link href="/" className="welcome-brand">RFX<span>BTC TEAM · CAMBODIA</span></Link><span>MARKET RESEARCH · NO BROKER EXECUTION</span><a href="#top">BACK TO TOP ↑</a></footer>
     <a className="welcome-community-cta" href="https://t.me/RFX_BTC_analyze" target="_blank" rel="noopener noreferrer" aria-label="Join community on Telegram — free">
       <span className="welcome-community-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21.5 3.2 18.2 20c-.25 1.18-.92 1.48-1.86.92l-5.15-3.8-2.49 2.4c-.28.28-.52.52-1.06.52l.37-5.24 9.54-8.62c.41-.37-.09-.57-.64-.2L5.12 13.35.08 11.77c-1.1-.34-1.12-1.1.23-1.63L20.02 2.5c.92-.34 1.73.22 1.48.7Z"/></svg></span>
       <span className="welcome-community-copy"><strong>Join community</strong><small>TELEGRAM - FREE</small></span>

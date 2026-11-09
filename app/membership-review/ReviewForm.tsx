@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import ControlButton from "../ControlButton";
 import { useEffect, useRef, useState } from "react";
@@ -38,5 +38,5 @@ export default function ReviewForm() {
     }catch(e){setError(e instanceof Error ? e.message : "មិនអាចរក្សាទុកបានទេ។");}
     finally{setBusy(false);}
   }
-  return <main className={`membership-review theme-${theme}`}><section><ThemeModeButton/><p className="eyebrow">RITH FX BTC · MEMBERSHIP REVIEW</p><h1>អនុម័តសមាជិកថ្មី</h1>{done ? <p role="status">{done==="approved" ? "បានអនុម័ត។ សមាជិកអាច Login ចូលឥឡូវនេះ។" : "បានបដិសេធ។ គណនីនេះមិនអាចចូលប្រើបានទេ។"}</p> : <>{busy && <p role="status">កំពុងដំណើរការ…</p>}{review && <><p>អ៊ីមែលអ្នកស្នើ៖ <strong>{review.email}</strong></p><p>តំណផុតកំណត់៖ {new Date(review.expiresAt).toLocaleString()}</p><p>សូមពិនិត្យអ៊ីមែលអ្នកស្នើ រួចជ្រើសរើសសកម្មភាពខាងក្រោម។</p><div className="smc-toolbar"><ControlButton disabled={busy} onClick={()=>void decide("approved")}>✓ Approve · អនុម័ត</ControlButton><ControlButton variant="danger" disabled={busy} onClick={()=>void decide("rejected")}>✕ Reject · បដិសេធ</ControlButton></div></>}{error && <p className="auth-error" role="alert">{error}</p>}{!review && !busy && <ControlButton onClick={()=>{setBusy(true);setAttempt(n=>n+1);}}>ព្យាយាមម្ដងទៀត</ControlButton>}</>}<Link href="/">ត្រឡប់ទៅទំព័រចូលគណនី</Link></section></main>;
+  return <main className={`membership-review theme-${theme}`}><section><ThemeModeButton/><p className="eyebrow">RFX BTC TEAM · MEMBERSHIP REVIEW</p><h1>អនុម័តសមាជិកថ្មី</h1>{done ? <p role="status">{done==="approved" ? "បានអនុម័ត។ សមាជិកអាច Login ចូលឥឡូវនេះ។" : "បានបដិសេធ។ គណនីនេះមិនអាចចូលប្រើបានទេ។"}</p> : <>{busy && <p role="status">កំពុងដំណើរការ…</p>}{review && <><p>អ៊ីមែលអ្នកស្នើ៖ <strong>{review.email}</strong></p><p>តំណផុតកំណត់៖ {new Date(review.expiresAt).toLocaleString()}</p><p>សូមពិនិត្យអ៊ីមែលអ្នកស្នើ រួចជ្រើសរើសសកម្មភាពខាងក្រោម។</p><div className="smc-toolbar"><ControlButton disabled={busy} onClick={()=>void decide("approved")}>✓ Approve · អនុម័ត</ControlButton><ControlButton variant="danger" disabled={busy} onClick={()=>void decide("rejected")}>✕ Reject · បដិសេធ</ControlButton></div></>}{error && <p className="auth-error" role="alert">{error}</p>}{!review && !busy && <ControlButton onClick={()=>{setBusy(true);setAttempt(n=>n+1);}}>ព្យាយាមម្ដងទៀត</ControlButton>}</>}<Link href="/">ត្រឡប់ទៅទំព័រចូលគណនី</Link></section></main>;
 }

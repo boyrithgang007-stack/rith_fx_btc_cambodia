@@ -46,5 +46,5 @@ test('image route requires approved auth, same origin, rate limit and a vision c
 test('image route only submits validated files and returns a non-executable image-only report',async()=>withConfig(async()=>{
   user={id:'member'};calls=0;
   assert.equal((await route.POST(request({image:'https://internal.local',question:''}))).status,400);assert.equal(calls,0);
-  const data=await image();const response=await route.POST(request({image:data,question:'Read labels'}));const report=await response.json();assert.equal(response.status,200);assert.equal(calls,1);assert.equal(report.tradeAction,'WAIT');assert.equal(report.basis,'image-only');assert.equal(report.width,120);assert.equal(JSON.stringify(report).includes('base64'),false);assert.equal('entry' in report,false);
+  const data=await image();const response=await route.POST(request({image:data,question:'Read labels'}));const report=await response.json();assert.equal(response.status,200);assert.equal(calls,1);assert.equal(report.tradeAction,'WAIT');assert.equal(report.basis,'image-only');assert.equal(report.width,120);assert.equal(JSON.stringify(report).includes('base64'),false);assert.equal('entry' in report,false);assert.equal('model' in report,false);
 }));

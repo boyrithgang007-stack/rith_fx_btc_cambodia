@@ -1,4 +1,4 @@
-﻿export type Candle = { time: number; open: number; high: number; low: number; close: number; volume: number };
+export type Candle = { time: number; open: number; high: number; low: number; close: number; volume: number; takerBuyVolume?: number };
 export type Direction = "BUY" | "SELL";
 export type Structure = { index: number; pivotIndex: number; price: number; direction: Direction; kind: "BOS" | "CHoCH" | "BREAK" };
 export type Zone = { id: string; direction: Direction; index: number; obIndex: number; top: number; bottom: number; obTop: number; obBottom: number; touchedAt: number | null; invalidatedAt: number | null };

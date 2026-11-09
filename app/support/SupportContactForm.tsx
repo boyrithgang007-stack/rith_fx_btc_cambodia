@@ -39,7 +39,7 @@ export default function SupportContactForm({ email }: { email: string }) {
   return <main className="support-page">
     <section className="support-card" aria-labelledby="support-title">
       <Link href="/dashboard" className="support-back">← ត្រឡប់ទៅ Dashboard</Link>
-      <p className="support-eyebrow">RITH FX BTC · CUSTOMER CARE</p>
+      <p className="support-eyebrow">RFX BTC TEAM · CUSTOMER CARE</p>
       <h1 id="support-title">ទាក់ទង Support</h1>
       <p>ផ្ញើសំណួរ ឬបញ្ហារបស់អ្នកមកកាន់ភ្នាក់ងារ Support។ យើងនឹងឆ្លើយតបតាមអ៊ីមែលគណនីរបស់អ្នក។</p>
       <form onSubmit={submit}>

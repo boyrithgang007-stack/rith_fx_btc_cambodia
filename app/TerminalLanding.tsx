@@ -7,7 +7,7 @@ import TerminalTorus from "./TerminalTorus";
 export default function TerminalLanding() {
   return <main className="terminal-entry terminal-dashboard">
     <header className="td-terminal-header">
-      <Link className="td-header-brand" href="/"><span className="td-brand-mark">RFX</span><span><b>RITH FX BTC</b><small>CAMBODIA / MARKET TERMINAL</small></span></Link>
+      <Link className="td-header-brand" href="/"><span className="td-brand-mark">RFX</span><span><b>RFX BTC TEAM</b><small>CAMBODIA / MARKET TERMINAL</small></span></Link>
       <span className="terminal-entry-status">PRIVATE WORKSPACE · SIGN IN REQUIRED</span>
       <Link className="terminal-open" href="/dashboard">ចូលប្រើ Dashboard ↗</Link>
       <Image className="terminal-entry-avatar" src="/images/rith-profile.jpeg" width={36} height={36} alt="RITH profile" />
@@ -24,6 +24,6 @@ export default function TerminalLanding() {
       <div className="td-torus-heading"><span className="td-label">MARKET STRUCTURE / PARTICLE FIELD</span></div>
       <div className="td-torus-layout"><div className="td-torus-stage"><TerminalTorus /><div className="td-torus-caption">DECORATIVE VISUALIZATION · NO MARKET DATA</div></div><aside className="td-torus-metrics"><div><span>WORKSPACE</span><strong>FX / BTC</strong><small>Metals &amp; energy</small></div><div><span>RESEARCH TOOLS</span><strong>OHLC</strong><small>Price history · Market breadth</small></div><div><span>ACCESS</span><strong>SECURE</strong><small>Approved members</small></div><Link href="/dashboard" className="terminal-open">OPEN TERMINAL ↗</Link></aside></div>
     </section>
-    <footer className="td-terminal-footer"><span>RITH FX BTC CAMBODIA</span><span>REFERENCE DATA MAY BE DELAYED</span><span>NO BROKER EXECUTION</span></footer>
+    <footer className="td-terminal-footer"><span>RFX BTC TEAM CAMBODIA</span><span>REFERENCE DATA MAY BE DELAYED</span><span>NO BROKER EXECUTION</span></footer>
   </main>;
 }

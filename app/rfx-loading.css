@@ -1,0 +1,14 @@
+.rfx-loading { position:fixed; inset:0; z-index:9999; display:grid; place-items:center; overflow:hidden; background:radial-gradient(ellipse at center,#101313 0,#090b0b 55%,#070909 100%); color:#b8c1c3; padding:24px; box-sizing:border-box; }
+.rfx-loading-content { position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; }
+.rfx-loading-emblem { position:relative; width:104px; height:104px; display:grid; place-items:center; }
+.rfx-loading-emblem img { width:64px; height:auto; border-radius:10px; box-shadow:0 5px 18px #0008; }
+.rfx-loading-ring { position:absolute; inset:0; border-radius:50%; background:conic-gradient(from 0deg,transparent 0deg,transparent 170deg,#536c7520 235deg,#a8d5dfb0 300deg,#e0f6ff 330deg,transparent 336deg); -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 1.5px)); mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 1.5px)); animation:rfx-loader-orbit 1.8s linear infinite; }
+.rfx-loading-emblem::before { content:""; position:absolute; inset:9px; border:1px solid #b3d6df0d; border-radius:50%; }
+.rfx-loading-brand { font:700 17px/1.4 Arial,sans-serif; letter-spacing:.08em; margin:14px 0 0; color:#aab3b5; }
+.rfx-loading-wave { width:112px; height:32px; margin-top:18px; overflow:visible; fill:none; stroke-linecap:round; stroke-linejoin:round; stroke-width:1.7; }
+.rfx-wave-base { stroke:#495354; }
+.rfx-wave-light { stroke:#c0dbe0; stroke-dasharray:24 180; animation:rfx-loader-wave 1.8s linear infinite; }
+@keyframes rfx-loader-orbit { to { transform:rotate(360deg); } }
+@keyframes rfx-loader-wave { from { stroke-dashoffset:204; opacity:.4; } to { stroke-dashoffset:0; opacity:.9; } }
+@media(max-width:480px) { .rfx-loading-emblem { width:92px; height:92px; }.rfx-loading-emblem img { width:58px; }.rfx-loading-brand { font-size:16px; }.rfx-loading-wave { width:104px; } }
+@media(prefers-reduced-motion:reduce) { .rfx-loading-ring,.rfx-wave-light { animation:none; }.rfx-wave-light { display:none; } }

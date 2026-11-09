@@ -63,7 +63,7 @@ test('macro AI endpoint authenticates, validates context and returns only the ge
      ?{isSameOriginRequest:request=>request.headers.get('origin')===new URL(request.url).origin,readLimitedJson:async request=>request.json()}
      :name.endsWith('/macro-ai')
        ?{macroAiConfigured:()=>configured,answerMacroQuestion:async input=>{received=input;return 'CPI answer';}}
-       :mod.exports;
+       :name.endsWith('/macro-evidence')?{loadMacroEvidence:async()=>({sources:[],checkedAt:123,quotes:[]})}:mod.exports;
  new Function('exports','module','require','fetch','process',source)(route.exports,route,dependencies,async()=>{throw Error('unused');},{env:{}});
  const context={calendar:null,scenario:null,quotes:[],pricesAsOf:null,calendarStatus:'unavailable',socialStatus:'unavailable',socialPostCount:0};
  const makeRequest=(body,origin='http://localhost')=>new Request('http://localhost/api/macro',{method:'POST',headers:{origin,'content-type':'application/json'},body:JSON.stringify(body)});
@@ -76,7 +76,7 @@ test('macro AI endpoint authenticates, validates context and returns only the ge
  assert.equal((await route.exports.POST(makeRequest(body))).status,503);
  configured=true;
  const response=await route.exports.POST(makeRequest(body));const result=await response.json();
- assert.equal(response.status,200);assert.deepEqual(result,{answer:'CPI answer'});
+ assert.equal(response.status,200);assert.deepEqual(result,{answer:'CPI answer',sources:[],checkedAt:123});assert.deepEqual(received.evidence,{sources:[],checkedAt:123,quotes:[]});
  assert.equal(received.question,body.question);assert.equal(received.language,'en');assert.deepEqual(received.context,context);
  assert.equal(response.headers.get('cache-control'),'private, no-store');
 });
@@ -107,4 +107,17 @@ test('Forex Factory remains independently connected when BLS fails without inven
  assert.equal(body.forexFactory.events[0].forecast,'0.7%');assert.equal(body.forexFactory.events[0].actual,null);
  assert.equal(body.forexFactory.sourceUrl,'https://www.forexfactory.com/calendar');
  assert.equal(response.headers.get('cache-control'),'private, no-store');
+});
+
+test('server evidence isolates failed sources and rejects stale crypto quotes',async()=>{
+ const source=ts.transpileModule(fs.readFileSync('app/lib/macro-evidence.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+ const loaded={exports:{}};new Function('exports','module','require',source)(loaded.exports,loaded,()=>mod.exports);
+ const now=Date.parse('2026-11-03T10:00:00Z');
+ const evidence=await loaded.exports.loadMacroEvidence(async url=>{
+   if(url.includes('bls.gov'))return new Response('',{status:503});
+   if(url.includes('faireconomy'))return Response.json([{title:'CPI m/m',country:'USD',date:'2026-11-03T10:00:00Z',impact:'High',forecast:'0.3%',previous:'0.2%'}]);
+   return Response.json({bitcoin:{usd:50000,last_updated_at:(now-600000)/1000}});
+ },now);
+ assert.deepEqual(evidence.sources.map(s=>s.status),['unavailable','available','unavailable']);
+ assert.deepEqual(evidence.quotes,[]);assert.equal(evidence.events[0].actual,null);
 });

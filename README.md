@@ -24,6 +24,8 @@ Azure keys stay on the server and must never be placed in a `NEXT_PUBLIC_` varia
 
 The analysis area includes a disabled-by-default Binance Futures Testnet EA, plus a Forex visual formula builder that calculates signals from read-only Exness MT5 candles. Forex order automation is not implemented. Read [docs/ea-bot-testnet.md](docs/ea-bot-testnet.md) and [docs/forex-ea.md](docs/forex-ea.md) before configuring either feature. Neither feature can place live orders.
 
+Use [EA/README.md](EA/README.md) as the index for all EA source files, setup guides, and current execution limits.
+
 ## Member administration
 
 The first administrator must be bootstrapped from a trusted shell connected to the same Supabase database as the app:
@@ -45,7 +47,7 @@ Back up the database before production deployment and verify the bootstrap comma
 3. Deploy, open `/api/health`, and confirm it returns `{"status":"ok"}`. Register and verify the first admin email, then run the bootstrap command from a trusted local shell with `DATABASE_URL` set to the same Supabase project.
 4. Sign in, review the member/admin controls, and test registration/approval and email delivery. Keep an offsite database backup and review Supabase/Vercel usage limits before inviting members. A fresh database starts empty; the previous local SQLite accounts and data are not migrated automatically.
 
-Vercel's serverless functions do not run the app's long-lived polling worker: automatic EA operation is intentionally unavailable there and the API refuses to enable it. Binance Futures remains Testnet-only. Forex signals require a secured, reachable HTTPS MT5 bridge; `127.0.0.1` inside Vercel is not the user's/local bridge. Vercel's request-size and execution limits also do not support the 250 MB dubbing workflow; use a separate VM/background worker and object storage for that feature.
+Vercel's serverless functions do not run the app's long-lived polling workers: automatic EA operation is intentionally unavailable there and the API refuses to enable it; automatic Telegram signal publishing also requires a separate persistent worker. Binance Futures remains Testnet-only. Forex signals require a secured, reachable HTTPS MT5 bridge; `127.0.0.1` inside Vercel is not the user's/local bridge. Vercel's request-size and execution limits also do not support the 250 MB dubbing workflow; use a separate VM/background worker and object storage for that feature.
 
 ## Docker / single-VM deployment
 
@@ -74,6 +76,19 @@ Speech recognition and Khmer voices use Azure Speech. Text translation uses Azur
 The dashboard includes a data-analysis view with a Crypto / Forex switch. Crypto analysis includes closed-candle BUY / SELL / WAIT signals, candlesticks, EMA 20, confirmed structure breaks, paired FVG/OB zones, stop/target levels, capped paper sizing, browser alerts, and a downloadable paper-trade log. Candle-analysis reports are saved per approved user (up to 100), plotted on the analyzed OHLC chart, and can be reopened from saved history; expired entries are labeled historical and are not current trade signals. Forex analysis shows ECB reference-rate history and movement; these rates are delayed and are not broker quotes or trade signals.
 
 The system uses NR branding and provides shared dark and standard modes across the dashboard, sign-in, home, research, and account screens. The dark theme uses deep navy surfaces with purple/blue neon accents; standard mode follows the supplied brushed-metal, carbon-fiber, walnut and blue-highlight reference. The selected mode is stored in the current browser's local storage. `/markets/settings` lets an approved user update their display name, bcrypt-protected password, and PNG/JPEG/WebP profile image; profile images are limited to 700 KB and stored in the private auth database. Users can also select a dashboard background color or upload an image up to 1.4 MB; appearance preferences stay in that browser's local storage and are not synced between devices.
+
+### Automatic Telegram signal publishing
+
+A long-running Node.js process monitors closed candles and posts each newly confirmed BUY/SELL signal once to a configured Telegram group. Messages include Entry, TP, SL, timeframe, source and next-candle expiry from the signal engine; levels are reference prices, not guaranteed execution prices. The worker waits for the next newly closed candle after startup, so it does not announce an older signal after a restart. PostgreSQL delivery records suppress duplicates. Definite Telegram API failures retry after one minute while the signal remains valid; a timeout with unknown delivery status is not retried to avoid duplicate group messages.
+
+Configure these server-only values in `.env.local`, add the bot to the target group with permission to send messages, then restart the app:
+
+- `TELEGRAM_BOT_TOKEN`: the bot token from BotFather.
+- `TELEGRAM_TARGET_CHAT_ID`: the group chat ID (or public group username supported by Telegram).
+- `TELEGRAM_SIGNAL_MARKETS`: optional comma-separated market/timeframe pairs, such as `BTCUSDT:15m,ETHUSDT:15m`; defaults to `BTCUSDT:15m`.
+- `TELEGRAM_SIGNAL_REWARD_RATIO`: optional `2` or `3`; defaults to `2`.
+
+Supported markets/timeframes are defined in `app/candle-markets.ts`. Binance provides BTC/ETH candles without a private key. Forex, metals and oil require Twelve Data access. The Analysis page shows whether the publisher is active. This worker runs only on a persistent local/single-VM Node.js server; Vercel serverless does not run it. Keep the bot token out of client-visible variables and source control.
 
 AI candle reviews and chart-image reading use the Google Gemini API. Create a key in [Google AI Studio](https://aistudio.google.com/apikey), then set `GEMINI_API_KEY` and a current JSON-output-capable `GEMINI_ANALYSIS_MODEL` ID in the server's `.env.local`; optionally set `GEMINI_VISION_MODEL` to a separate image-capable model (it falls back to `GEMINI_ANALYSIS_MODEL`). Use the model ID shown in AI Studio (without a `models/` prefix), keep the key server-only, and restart the app. Gemini reviews only the submitted evidence and cannot promote a technical `WAIT` signal to a trade entry. Technical candle analysis remains available without Gemini configuration.
 

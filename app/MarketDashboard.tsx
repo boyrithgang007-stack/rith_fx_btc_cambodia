@@ -248,6 +248,9 @@ export default function MarketDashboard({ user, view = "overview" }: { user: Aut
   }, [marketCache]);
   const marketAssets = useMemo(() => updatedAt ? assets : cachedMarket?.assets ?? [], [assets, cachedMarket, updatedAt]);
   const lastUpdatedAt = updatedAt ?? (cachedMarket?.updatedAt ? new Date(cachedMarket.updatedAt) : null);
+Warning: truncated output (original token count: 6939)
+Total output lines: 126
+
   const selected = marketAssets.find((asset) => asset.id === selectedId) ?? marketAssets[0];
   const selectedForexPair = forexData?.pairs.find((pair) => pair.symbol === forexPairSymbol);
   const forexConvertedAmount = selectedForexPair ? forexAmount * selectedForexPair.rate : 0;
@@ -274,9 +277,9 @@ export default function MarketDashboard({ user, view = "overview" }: { user: Aut
 
   return <main className={`market-app theme-${theme}${view === "overview" ? " terminal-shell cinematic-terminal" : ""}`}>
     <aside className="dashboard-sidebar workspace-sidebar">
-    <Link className="market-brand" href="/" aria-label="RFX Team, RITH FX BTC Cambodia Market Observatory home">
+    <Link className="market-brand" href="/" aria-label="RFX BTC TEAM Cambodia Market Observatory home">
       <Image className="market-brand-logo" src="/brand/rfx-team-logo.png" alt="RFX Team" width={1376} height={768} sizes="(max-width: 760px) 104px, 210px" priority />
-      <span className="market-brand-caption"><strong>RITH FX BTC</strong><small>CAMBODIA · MARKET OBSERVATORY</small></span>
+      <span className="market-brand-caption"><strong>RFX BTC TEAM</strong><small>CAMBODIA · MARKET OBSERVATORY</small></span>
     </Link>
       <p className="sidebar-label">ម៉ឺនុយ</p>
       <nav className="sidebar-nav" aria-label="ម៉ឺនុយមេ">
@@ -305,7 +308,7 @@ export default function MarketDashboard({ user, view = "overview" }: { user: Aut
           <Image src={profile.avatarDataUrl || "/images/rith-profile.jpeg"} alt="" width={36} height={36} unoptimized />
           <span className="sidebar-profile-copy"><strong>{displayName}</strong><small>{userEmail}</small></span><span className="sidebar-profile-arrow">↗</span>
         </Link>
-        <div className="sidebar-live"><span className="status-pulse" /><span>ទិន្នន័យយោង<small>{view === "forex" ? "Frankfurter · ECB" : "CoinGecko"}</small></span></div>
+        <div className="sidebar-live"><span aria-hidden="true">◉</span><span>ប្រភពទិន្នន័យ<small>{view === "macro"?"BLS · Forex Factory":view === "analysis"?"Candle provider · per symbol":view === "forex"?"Frankfurter · ECB":"CoinGecko · reference"}</small></span></div>
       </div>
     </aside>
     <div className="dashboard-workspace">
@@ -317,24 +320,7 @@ export default function MarketDashboard({ user, view = "overview" }: { user: Aut
       {error && view !== "overview" && view !== "settings" && view !== "macro" && view !== "analysis" && <div className="error-banner" role="status"><span>{error}</span><ControlButton onClick={() => void loadMarkets()}>ព្យាយាមម្តងទៀត</ControlButton></div>}
       {view === "macro" && <MacroObservatory quotes={marketAssets.map(asset => ({symbol: asset.symbol, price: asset.current_price}))} updatedAt={lastUpdatedAt?.toISOString() ?? null} />}
       {view === "overview" && <TerminalDashboard assets={marketAssets} loading={loading} error={error} updatedAt={lastUpdatedAt} selectedId={selectedId} onSelectAsset={(id) => selectStoredValue("market-selected-asset", id)} onRefresh={() => void loadMarkets()} economicFeed={economicFeed} />}
-      {view === "strategy" && <div className="analysis-market-switch" role="group" aria-label="ជ្រើសរើសទីផ្សារសម្រាប់វិភាគ"><span>ប្រភេទទីផ្សារ</span><div><ControlButton type="button" className={analysisMarket === "crypto" ? "active" : ""} aria-pressed={analysisMarket === "crypto"} onClick={() => setAnalysisMarket("crypto")}>◈ Crypto</ControlButton><ControlButton type="button" className={analysisMarket === "forex" ? "active" : ""} aria-pressed={analysisMarket === "forex"} onClick={() => setAnalysisMarket("forex")}>⇄ Forex</ControlButton></div></div>}
-      {(view === "charts" || (view === "strategy" && analysisMarket === "crypto")) && <div className="market-instrument-picker"><label htmlFor="market-instrument">កាក់សម្រាប់ក្រាប និងវិភាគ</label><select id="market-instrument" value={selectedId} onChange={(event) => selectStoredValue("market-selected-asset", event.target.value)}>{marketAssets.map((asset) => <option key={asset.id} value={asset.id}>{asset.name} ({asset.symbol.toUpperCase()})</option>)}</select><span>ការជ្រើសរើសត្រូវបានចែករំលែករវាងក្រាប និងវិភាគទិន្នន័យ។</span></div>}
-      {view === "analysis" && <><CandleSignalDesk /><ResearchWorkbench /></>}
-      {view === "charts" && <section className="market-main-grid" id="analytics">
-        <article className="panel chart-panel"><div className="panel-topline"><div><p className="eyebrow">ទិដ្ឋភាពទ្រព្យសកម្ម</p><div className="selected-asset">{selected && <><Image src={selected.image} alt="" width={28} height={28} unoptimized /><div><h2>{selected.name}</h2><span>{selected.symbol.toUpperCase()} <i>·</i> USD</span></div></>}</div></div><ControlButton aria-pressed={Boolean(selected && favorites.includes(selected.id))} controlSize="icon" className={`favorite-toggle ${selected && favorites.includes(selected.id) ? "favorited" : ""}`} onClick={() => selected && favorite(selected.id)} aria-label="ដាក់ក្នុងបញ្ជីចូលចិត្ត">{selected && favorites.includes(selected.id) ? "★" : "☆"}</ControlButton></div>
-          <div className="chart-price-row"><strong>{selected ? price(selected.current_price) : "—"}</strong>{selected && <span className={`change-pill ${marketUp ? "positive" : "negative"}`}>{percent(selected.price_change_percentage_24h)} <small>24h</small></span>}</div>
-          <div className="chart-toolbar"><div className="chart-legend"><span className="candle-legend-up" /> ឡើង <span className="candle-legend-down" /> ចុះ · OHLC</div><div className="range-switch" role="group" aria-label="រយៈពេលក្រាប">{([["1", "24 ម៉ោង"], ["7", "7 ថ្ងៃ"], ["30", "30 ថ្ងៃ"]] as [Range, string][]).map(([value, label]) => <ControlButton key={value} className={range === value ? "active" : ""} aria-pressed={range === value} onClick={() => setRange(value)}>{label}</ControlButton>)}</div></div>
-          <div className="chart-stage">{chartLoading ? <div className="chart-skeleton"><span /><span /><span /></div> : <CandlestickChart candles={chartCandles} />}</div><div className="chart-foot"><span>តម្លៃបច្ចុប្បន្ន</span><strong>{selected ? price(selected.current_price) : "—"}</strong><span>កម្រិតប្រែប្រួល 24h</span><strong className={marketUp ? "text-positive" : "text-negative"}>{selected ? percent(selected.price_change_percentage_24h) : "—"}</strong></div>
-        </article>
-        <aside className="panel detail-panel"><div className="panel-heading"><div><p className="eyebrow">ស្ថិតិសំខាន់ៗ</p><h2>ទិន្នន័យទីផ្សារ</h2></div><span className="detail-icon">↗</span></div><div className="detail-symbol">{selected ? <><Image src={selected.image} alt="" width={25} height={25} unoptimized /><span>{selected.symbol.toUpperCase()}<small>{selected.name}</small></span></> : <span>កំពុងទាញទិន្នន័យ…</span>}</div><div className="detail-row"><span>មូលធនទីផ្សារ</span><strong>{selected ? compact.format(selected.market_cap) : "—"}</strong></div><div className="detail-row"><span>បរិមាណជួញដូរ 24h</span><strong>{selected ? compact.format(selected.total_volume) : "—"}</strong></div><div className="detail-row"><span>ប្រែប្រួល 7 ថ្ងៃ</span><strong className={(selected?.price_change_percentage_7d_in_currency ?? 0) >= 0 ? "text-positive" : "text-negative"}>{selected ? percent(selected.price_change_percentage_7d_in_currency) : "—"}</strong></div><div className="detail-note"><span className="note-mark">i</span><p>ទិន្នន័យសម្រាប់ព័ត៌មានប៉ុណ្ណោះ។ មិនមែនជាការណែនាំវិនិយោគទេ។</p></div></aside>
-      </section>}
-      {view === "strategy" && analysisMarket === "crypto" && <StrategyPanel key={selectedId} coin={selectedId} name={selected?.name ?? selectedId} />}
-      {view === "strategy" && analysisMarket === "forex" && <><ForexEaPanel isAdmin={user.role === "admin"} /><section className="panel forex-panel" aria-label="វិភាគទិន្នន័យ Forex">
-        <div className="forex-heading"><div><p className="eyebrow">FOREX · ECB REFERENCE DATA</p><h2>វិភាគទិន្នន័យ Forex</h2><p>ចលនាអត្រាយោងប្រចាំថ្ងៃសម្រាប់គូដែលបានជ្រើសរើស។ មិនមែនតម្លៃ broker real-time ឬសញ្ញាបញ្ជាទិញទេ។</p></div><div className="forex-heading-actions"><span>{forexData ? `As of ${forexData.asOf}` : forexLoading ? "កំពុងទាញទិន្នន័យ" : "មិនមានទិន្នន័យ"}</span><ControlButton className="watchlist-filter" onClick={() => { setForexLoading(true); void loadForex(); }} disabled={forexLoading}>↻ Refresh</ControlButton></div></div>
-        {forexError && <div className="forex-error" role="alert">{forexError}</div>}
-        <div className="forex-analysis-toolbar"><label>គូសម្រាប់វិភាគ<select value={forexPairSymbol} onChange={(event) => selectStoredValue("market-forex-pair", event.target.value)}>{forexData?.pairs.map((pair) => <option key={pair.symbol} value={pair.symbol}>{pair.symbol}</option>)}</select></label><div className="range-switch" role="group" aria-label="រយៈពេលវិភាគ Forex"><ControlButton className={forexRange === 7 ? "active" : ""} aria-pressed={forexRange === 7} onClick={() => setForexRange(7)}>7 ថ្ងៃ</ControlButton><ControlButton className={forexRange === 30 ? "active" : ""} aria-pressed={forexRange === 30} onClick={() => setForexRange(30)}>30 ថ្ងៃ</ControlButton></div></div>
-        <div className="forex-analysis-panel"><div className="forex-analysis-summary"><p className="eyebrow">{forexPairSymbol} · REFERENCE HISTORY</p><strong>{forexEndRate ? forexPrice(forexEndRate) : "—"}</strong><span className={forexRangeChange === null ? "" : forexRangeChange >= 0 ? "text-positive" : "text-negative"}>{forexRangeChange === null ? "មិនមានទិន្នន័យប្រៀបធៀប" : `${percent(forexRangeChange)} · ${forexRange} ថ្ងៃ`}</span><small>{forexHistory.length} ចំណុចទិន្នន័យ · {forexData?.source ?? (forexLoading ? "កំពុងទាញទិន្នន័យ…" : "មិនមានទិន្នន័យ")}</small></div><ForexHistoryChart history={forexHistory} symbol={forexPairSymbol} /></div>
-        <p className="forex-disclaimer">ទិន្នន័យ Frankfurter/ECB ត្រូវបានធ្វើបច្ចុប្បន្នភាពតាមថ្ងៃធ្វើការ និងអាចយឺតជាង broker quote។ សូមប្រើតម្លៃពី broker របស់អ្នកមុនពេលសម្រេចចិត្តជួញដូរ។</p>
+      {view === "strategy" && <div className="analysis-market-switch" role="group" aria-label="ជ្រើសរើសទីផ្សារសម្រាប់វិភាគ"><span>ប្រភេទទីផ្សារ</span><div><ControlButton type="button" className={analysisMarket === "cryp…1939 tokens truncated…ាពតាមថ្ងៃធ្វើការ និងអាចយឺតជាង broker quote។ សូមប្រើតម្លៃពី broker របស់អ្នកមុនពេលសម្រេចចិត្តជួញដូរ។</p>
       </section></>}
       {view === "forex" && <><ForexEaPanel isAdmin={user.role === "admin"} /><section className="panel forex-panel" id="forex">
         <div className="forex-heading"><div><p className="eyebrow">FOREIGN EXCHANGE · ECB REFERENCE</p><h2>Forex currency pairs</h2><p>អត្រាយោងប្រចាំថ្ងៃ (មិនមែន broker quote ឬតម្លៃ real-time)។</p></div><div className="forex-heading-actions"><span>{forexData ? `As of ${forexData.asOf}` : "កំពុងទាញទិន្នន័យ"}</span><ControlButton className="watchlist-filter" onClick={() => { setForexLoading(true); void loadForex(); }} disabled={forexLoading}>↻ Refresh</ControlButton></div></div>

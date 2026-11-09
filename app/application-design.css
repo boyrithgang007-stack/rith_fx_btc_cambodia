@@ -302,32 +302,6 @@
 .learning-page.theme-scope:is(.theme-light,.theme-dark) :is(.learning-demo-label,.learning-insight,.learning-formula,.learning-feedback,.learning-quiz label) { border-radius:16px; }
 .learning-page.theme-scope:is(.theme-light,.theme-dark) .learning-header { border-radius:0; box-shadow:none; }
 .learning-page.theme-scope:is(.theme-light,.theme-dark) .learning-intro h1 { font-size:clamp(28px,3.5vw,40px); line-height:1.8; letter-spacing:0; }
-.market-app:is(.theme-light,.theme-dark) .trading-risk-guidance {
-  display:grid; gap:10px; margin:12px 0 2px; padding:14px 16px;
-  border:1px solid var(--mode-border); border-radius:14px;
-  background:var(--mode-inset); color:var(--mode-text);
-}
-.market-app:is(.theme-light,.theme-dark) .trading-risk-guidance>p {
-  display:flex; align-items:baseline; flex-wrap:wrap; gap:6px 10px;
-  margin:0; color:var(--mode-muted); font-size:12px; line-height:1.9;
-}
-.market-app:is(.theme-light,.theme-dark) .trading-risk-guidance>p strong {
-  color:var(--mode-text); font-size:12px; font-weight:700;
-}
-.market-app:is(.theme-light,.theme-dark) .trading-risk-defaults {
-  display:flex; align-items:center; flex-wrap:wrap; gap:6px 9px;
-  color:var(--mode-muted); font-size:11px; line-height:1.8;
-}
-.market-app:is(.theme-light,.theme-dark) .trading-risk-defaults strong {
-  color:var(--mode-text); font-size:11px; font-variant-numeric:tabular-nums;
-}
-.market-app:is(.theme-light,.theme-dark) .trading-risk-actions {
-  display:flex; justify-content:flex-start; margin-top:2px;
-}
-.market-app:is(.theme-light,.theme-dark) .trading-risk-actions .settings-primary-button {
-  min-height:44px; padding:10px 20px; border-radius:999px;
-  font-size:12px; line-height:1.8;
-}
 .market-app:is(.theme-light,.theme-dark) :is(.page-intro h1,.panel h2,.panel h3,.settings-card h2),
 .theme-scope:is(.theme-light,.theme-dark) :is(.connections-intro h1,.connection-card h3) { letter-spacing:0; }
 .market-app.cinematic-terminal:is(.theme-light,.theme-dark) .terminal-dashboard .td-panel h2 { letter-spacing:0; }
@@ -339,7 +313,6 @@
 @media(max-width:760px) {
   .market-app.cinematic-terminal:is(.theme-light,.theme-dark) .terminal-nav { display:flex; overflow-x:auto; flex-wrap:nowrap; padding-block:6px; scrollbar-width:thin; }
   .market-app.cinematic-terminal:is(.theme-light,.theme-dark) .terminal-nav a { flex:0 0 auto; white-space:nowrap; }
-  .market-app:is(.theme-light,.theme-dark) .trading-risk-guidance { padding:12px 13px; }
   .theme-scope:is(.theme-light,.theme-dark) :is(.connection-card,.bank-payment-card,.connections-balance,.account-hub-grid>a) { padding:18px; }
   .theme-scope:is(.theme-light,.theme-dark) .connections-header { height:auto; min-height:66px; flex-wrap:wrap; gap:12px; padding-block:14px; }
 }

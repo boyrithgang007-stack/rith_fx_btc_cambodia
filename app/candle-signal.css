@@ -21,7 +21,24 @@
 .market-app:is(.theme-light,.theme-dark) .candle-signal-desk .signal-action { padding:8px 16px; border-radius:999px; font:700 13px/1.8 Arial,sans-serif; color:var(--mode-text); background:var(--mode-surface); border:1px solid var(--mode-border); }
 .market-app:is(.theme-light,.theme-dark) .candle-signal-desk .action-buy { color:#08744c; background:#e4f8ef; }
 .market-app:is(.theme-light,.theme-dark) .candle-signal-desk .action-sell { color:#a92d43; background:#fff0f3; }
-.signal-report-levels { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin:20px 0; }
+.signal-report-levels { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin:20px 0; }.signal-tp-levels { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:12px 0 20px; }.signal-mode-cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:14px 0; }
+.signal-mode-cards button { display:grid; gap:7px; padding:16px; text-align:left; color:var(--mode-text); border:1px solid var(--mode-border); border-radius:14px; background:var(--mode-surface); cursor:pointer; }
+.signal-mode-cards button:hover:not(:disabled) { border-color:#20b98c; }
+.signal-mode-cards button:disabled { opacity:.55; cursor:not-allowed; }
+.signal-mode-cards span { color:#20b98c; font-size:11px; font-weight:800; letter-spacing:.12em; }
+.signal-mode-cards strong { font-size:16px; }
+.signal-mode-cards small { color:var(--mode-muted); }
+.signal-tp-levels>div { padding:14px; border:1px solid var(--mode-border); border-radius:14px; background:var(--mode-surface); }
+.signal-tp-levels>div.is-selected { border-color:#20b98c; box-shadow:0 0 0 1px #20b98c inset; }
+.signal-tp-levels span,.signal-tp-levels strong { display:block; }
+.signal-tp-levels span { color:var(--mode-muted); font-size:12px; }
+.signal-tp-levels strong { margin-top:8px; font-size:18px; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.market-pressure { margin:18px 0; padding:16px; border:1px solid var(--mode-border); border-radius:14px; background:var(--mode-surface); }
+.market-pressure-heading,.market-pressure-labels { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.market-pressure-heading span { color:var(--mode-muted); font-size:12px; }
+.market-pressure-bar { height:10px; margin:12px 0 8px; overflow:hidden; border-radius:99px; background:#ee6176; }
+.market-pressure-bar i { display:block; height:100%; background:#20b98c; transition:width .25s ease; }
+.market-pressure-labels { font-size:12px; }
 .signal-report-levels>div { padding:18px; border:1px solid var(--mode-border); border-radius:16px; background:var(--mode-surface); }
 .signal-report-levels span { display:block; color:var(--mode-muted); font-size:12px; }
 .signal-report-levels strong { display:block; margin-top:10px; font-size:22px; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
@@ -46,6 +63,20 @@
 .signal-ohlc-chart .action-sell .signal-marker { fill:#c4435d; }
 .signal-ohlc-chart .action-buy text { fill:#08744c; font-weight:700; }
 .signal-ohlc-chart .action-sell text { fill:#a92d43; font-weight:700; }
+.signal-ohlc-chart :is(.chart-buy-tag,.chart-sell-tag) line { stroke:currentColor; stroke-width:1.5; }
+.signal-ohlc-chart .chart-buy-tag { color:#08744c; }
+.signal-ohlc-chart .chart-sell-tag { color:#b32d48; }
+.signal-ohlc-chart .chart-buy-tag rect { fill:#08744c; }
+.signal-ohlc-chart .chart-sell-tag rect { fill:#b32d48; }
+.signal-ohlc-chart :is(.chart-buy-tag,.chart-sell-tag,.signal-marker-group) text { fill:#fff; font-weight:700; }
+.signal-ohlc-chart .current-signal-tag { fill:#08744c; }
+.signal-ohlc-chart .action-sell .current-signal-tag { fill:#b32d48; }
+.signal-chart-guide { padding:12px 14px; border-radius:12px; background:var(--mode-active); }
+.interactive-signal-chart { margin:20px 0; padding:14px; background:var(--mode-inset); border:1px solid var(--mode-border); border-radius:20px; overflow:hidden; }
+.interactive-signal-chart figcaption { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; padding:4px 4px 14px; color:var(--mode-muted); font-size:12px; line-height:1.8; }
+.interactive-signal-chart figcaption strong { padding:6px 12px; border-radius:10px; background:var(--mode-active); }
+.signal-canvas { width:100%; height:480px; border-radius:12px; overflow:hidden; }
+@media(max-width:760px) { .interactive-signal-chart { padding:8px; border-radius:16px; }.signal-canvas { height:420px; } }
 .image-analysis-panel { margin-top:28px; padding:24px; border:1px solid var(--mode-border); border-radius:20px; background:var(--mode-surface); }
 .image-analysis-heading { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; }
 .image-analysis-actions { display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin:20px 0; }
@@ -56,6 +87,9 @@
 .image-analysis-preview img { display:block; width:100%; height:auto; max-height:480px; object-fit:contain; }
 .image-analysis-question { display:grid; gap:10px; margin:20px 0; font-size:14px; }
 .image-analysis-question textarea { resize:vertical; width:100%; padding:12px 14px; }
+.image-analysis-how-it-works { margin:16px 0; padding:16px; border:1px solid var(--mode-border); border-radius:16px; background:var(--mode-inset); }
+.image-analysis-how-it-works h4 { margin:0 0 8px; font-size:14px; line-height:1.9; }
+.image-analysis-how-it-works p { margin:8px 0 0; }
 .image-analysis-result { margin-top:24px; padding:22px; background:var(--mode-inset); border:1px solid var(--mode-border); border-radius:18px; }
 .image-analysis-facts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
 .image-analysis-facts>div { padding:14px; border:1px solid var(--mode-border); border-radius:12px; background:var(--mode-surface); }
@@ -69,4 +103,4 @@
 .image-analysis-result summary { cursor:pointer; line-height:2; }
 @media(max-width:650px) { .image-analysis-panel,.image-analysis-result { padding:16px; }.image-analysis-facts { grid-template-columns:1fr; } }
 .market-app:is(.theme-light,.theme-dark) .candle-signal-desk .signal-error { border:1px solid #d58b98; border-radius:14px; background:#fff0f3; color:#9e273e; padding:14px 18px; }
-@media(max-width:650px) { .tv-chart-host { height:420px; }.signal-report { padding:16px; }.signal-report-levels { grid-template-columns:1fr; }.ai-candle-review { padding:16px; } }
+@media(max-width:650px) { .tv-chart-host { height:420px; }.signal-report { padding:16px; }.signal-report-levels { grid-template-columns:1fr; }.signal-tp-levels { grid-template-columns:1fr; }.signal-mode-cards { grid-template-columns:1fr; }.ai-candle-review { padding:16px; } }

@@ -2,6 +2,7 @@
 import { isSameOriginRequest, readLimitedJson } from "@/app/lib/auth-http";
 import { answerMacroQuestion, macroAiConfigured, type MacroQuestionContext } from "@/app/lib/macro-ai";
 import { parseCpiCalendar, parseForexFactoryCalendar, type MacroData, type SocialPost } from "@/app/lib/macro";
+import {loadMacroEvidence} from "@/app/lib/macro-evidence";
 export const runtime="nodejs";
 export const maxDuration=60;
 const json=(body:unknown,status=200)=>Response.json(body,{status,headers:{"Cache-Control":"private, no-store"}});
@@ -63,11 +64,12 @@ export async function POST(request:Request){
     ||(body.language!=="km"&&body.language!=="en")||!validContext(body.context)){
     return json({error:"Enter a question up to 500 characters and refresh the CPI context."},400);
   }
-  if(!macroAiConfigured())return json({error:"AI is not configured. Set GEMINI_API_KEY and GEMINI_ANALYSIS_MODEL on the server."},503);
+  if(!macroAiConfigured())return json({error:"មុខងារជំនួយការទីផ្សារមិនទាន់អាចប្រើបានទេ។ សូមសាកល្បងម្ដងទៀតនៅពេលក្រោយ។"},503);
   try{
-    const answer=await answerMacroQuestion({question:body.question.trim(),language:body.language,context:body.context});
-    return json({answer});
+    const evidence=await loadMacroEvidence();
+    const answer=await answerMacroQuestion({question:body.question.trim(),language:body.language,context:body.context,evidence});
+    return json({answer,sources:evidence.sources,checkedAt:evidence.checkedAt});
   }catch{
-    return json({error:"AI could not complete this answer. Check the server Gemini configuration and try again."},502);
+    return json({error:"មិនអាចបង្កើតចម្លើយបានទេ។ សូមសាកល្បងម្ដងទៀត។"},502);
   }
 }

@@ -4,6 +4,7 @@ export const CANDLE_MARKETS = {
   XAUUSD:{label:"Gold · XAU / USD",tv:"OANDA:XAUUSD",provider:"twelvedata",symbol:"XAU/USD"},
   XAGUSD:{label:"Silver · XAG / USD",tv:"OANDA:XAGUSD",provider:"twelvedata",symbol:"XAG/USD"},
   WTIUSD:{label:"WTI oil / USD",tv:"TVC:USOIL",provider:"twelvedata",symbol:"WTI/USD"},
+  BRENTUSD:{label:"Brent oil / USD",tv:"TVC:UKOIL",provider:"twelvedata",symbol:"XBR/USD"},
   EURUSD:{label:"EUR / USD",tv:"OANDA:EURUSD",provider:"twelvedata",symbol:"EUR/USD"},
   GBPUSD:{label:"GBP / USD",tv:"OANDA:GBPUSD",provider:"twelvedata",symbol:"GBP/USD"},
   USDJPY:{label:"USD / JPY",tv:"OANDA:USDJPY",provider:"twelvedata",symbol:"USD/JPY"},

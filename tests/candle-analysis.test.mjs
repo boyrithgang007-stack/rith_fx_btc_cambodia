@@ -24,6 +24,30 @@ function load(file){
 const feed=load('app/lib/candle-feed.ts'),engine=load('app/lib/candle-signal.ts'),reviewer=load('app/lib/candle-review.ts'),route=load('app/api/candle-analysis/route.ts');
 const interval=900000,now=1_800_000_000_000;
 const rows=()=>Array.from({length:81},(_,i)=>{const open=now-(80-i)*interval;return [open,'100','102','99','101','10',open+interval-1];});
+
+test('closed-candle BUY and SELL preserve stop and entry while the selected reward is exactly 2R or 3R',()=>{
+  let seed=12345,price=100;
+  const rand=()=>{seed=(1664525*seed+1013904223)>>>0;return seed/2**32;};
+  const data=Array.from({length:450},(_,i)=>{const open=price;price=Math.max(20,open+(rand()-.48)*8);return {time:(i+1)*interval,open,close:price,high:Math.max(open,price)+rand()*2,low:Math.min(open,price)-rand()*2,volume:0};});
+  const found=new Set();
+  for(const series of [data,data.map(c=>({...c,open:1000-c.open,close:1000-c.close,high:1000-c.low,low:1000-c.high}))])for(let n=60;n<=series.length;n++){
+    const prefix=series.slice(0,n),time=prefix.at(-1).time;
+    const two=engine.closedCandleSignal(prefix,interval,time,2).signal,three=engine.closedCandleSignal(prefix,interval,time,3).signal;
+    assert.equal(two.action,three.action);
+    if(two.action==='WAIT')continue;
+    found.add(two.action);assert.equal(two.entry,three.entry);assert.equal(two.stopLoss,three.stopLoss);
+    for(const [signal,rr] of [[two,2],[three,3]]){
+      const risk=Math.abs(signal.entry-signal.stopLoss);
+      assert.ok(Math.abs(Math.abs(signal.takeProfit-signal.entry)/risk-rr)<1e-8);
+      assert.ok(signal.action==='BUY'?signal.stopLoss<signal.entry&&signal.entry<signal.takeProfit:signal.takeProfit<signal.entry&&signal.entry<signal.stopLoss);
+    }
+  }
+  assert.deepEqual([...found].sort(),['BUY','SELL']);
+  const fullMarkers=engine.candleSignalMarkers(data,interval,2);
+  assert.ok(fullMarkers.length>0);
+  for(const size of [150,250,350])assert.deepEqual(engine.candleSignalMarkers(data.slice(0,size),interval,2),fullMarkers.filter(m=>m.time<=data[size-1].time));
+  assert.equal(engine.closedCandleSignal(data,interval,data.at(-1).time,4).signal.action,'WAIT');
+});
 test('Binance uses close timestamps, drops the unclosed candle and rejects malformed/future OHLC',()=>{
   const parsed=feed.parseBinanceCandles(rows(),interval,now);assert.equal(parsed.length,80);assert.equal(parsed.at(-1).time,now);assert.equal(parsed[0].volume,10);
   for(const mutate of [a=>a[3][2]='90',a=>a[3][5]='-1',a=>a[3][6]+=1,a=>a[3][0]=now+1]){const data=rows();mutate(data);assert.throws(()=>feed.parseBinanceCandles(data,interval,now));}
@@ -74,7 +98,7 @@ test('candle endpoint protects auth, origin, rate limits, symbols and AI configu
   try{
     assert.equal((await route.POST(request({market:'BTCUSDT',frame:'15m',includeAi:true}))).status,503);
     process.env.GEMINI_API_KEY='test';process.env.GEMINI_ANALYSIS_MODEL='gemini-test-model';
-    const status=await(await route.GET()).json();assert.equal(status.aiConfigured,true);assert.equal(status.aiProvider,'Google Gemini (server configuration required)');assert.ok(Array.isArray(status.reports));
+    const status=await(await route.GET()).json();assert.equal(status.aiConfigured,true);assert.equal('aiProvider' in status,false);assert.ok(Array.isArray(status.reports));
   }finally{for(const [name,value] of [['GEMINI_API_KEY',key],['GEMINI_ANALYSIS_MODEL',model]]){if(value===undefined)delete process.env[name];else process.env[name]=value;}}
 });
 test('AI cannot promote WAIT and disagreement vetoes an otherwise directional technical setup',async()=>{
@@ -82,7 +106,8 @@ test('AI cannot promote WAIT and disagreement vetoes an otherwise directional te
   routeFeed=async()=>({candles:feed.parseBinanceCandles(rows(),interval,now),source:'Test',volumeAvailable:true});
   const check=(action)=>({signal:{action,reason:'Rule result',entry:100,stopLoss:99,takeProfit:102,checks:[]},analysis:{trend:'BULLISH',ema:[]},expiresAt:Date.now()+60000});
   try{
-    routeSignal=()=>check('BUY');routeReview=async()=>({status:'reviewed',consistent:false,model:'test',summary:'Uncertain',risks:[],observations:[]});let result=await(await route.POST(request({market:'BTCUSDT',frame:'15m',includeAi:true}))).json();assert.equal(result.signal.action,'WAIT');assert.equal(result.signal.entry,null);assert.equal(savedReports.get('owner').at(-1).id,result.id);
-    routeSignal=()=>({...check('WAIT'),signal:{...check('WAIT').signal,entry:null,stopLoss:null,takeProfit:null}});routeReview=async()=>({status:'reviewed',consistent:true,model:'test',summary:'WAIT supported',risks:[],observations:[]});result=await(await route.POST(request({market:'BTCUSDT',frame:'15m',includeAi:true}))).json();assert.equal(result.signal.action,'WAIT');assert.equal(result.signal.entry,null);assert.equal('quantity' in result.signal,false);assert.equal(savedReports.get('owner').length,2);
+    routeSignal=()=>check('BUY');routeReview=async()=>({status:'reviewed',consistent:false,summary:'Uncertain',risks:[],observations:[]});let result=await(await route.POST(request({market:'BTCUSDT',frame:'15m',includeAi:true}))).json();assert.equal(result.signal.action,'WAIT');assert.equal(result.signal.entry,null);assert.equal(savedReports.get('owner').at(-1).id,result.id);
+    routeSignal=()=>check('BUY');routeReview=async()=>({status:'reviewed',consistent:true,summary:'Signal confirmed',risks:[],observations:[]});result=await(await route.POST(request({market:'BTCUSDT',frame:'15m',includeAi:true}))).json();assert.equal(result.signal.action,'BUY');assert.equal(result.signal.entry,100);assert.equal(result.signal.stopLoss,99);assert.equal(result.signal.takeProfit,102);assert.equal('model' in result.ai,false);
+    routeSignal=()=>({...check('WAIT'),signal:{...check('WAIT').signal,entry:null,stopLoss:null,takeProfit:null}});routeReview=async()=>({status:'reviewed',consistent:true,summary:'WAIT supported',risks:[],observations:[]});result=await(await route.POST(request({market:'BTCUSDT',frame:'15m',includeAi:true}))).json();assert.equal(result.signal.action,'WAIT');assert.equal(result.signal.entry,null);assert.equal('quantity' in result.signal,false);assert.equal(savedReports.get('owner').length,3);
   }finally{for(const [k,v] of [['GEMINI_API_KEY',key],['GEMINI_ANALYSIS_MODEL',model]]){if(v===undefined)delete process.env[k];else process.env[k]=v;}}
 });

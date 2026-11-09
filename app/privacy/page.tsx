@@ -2,22 +2,22 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "សេចក្តីជូនដំណឹងអំពីឯកជនភាព | RITH FX BTC",
-  description: "ព័ត៌មានអំពីទិន្នន័យដែល RITH FX BTC ប្រមូល ប្រើ និងរក្សាទុក។",
+  title: "សេចក្តីជូនដំណឹងអំពីឯកជនភាព | RFX BTC TEAM",
+  description: "ព័ត៌មានអំពីទិន្នន័យដែល RFX BTC TEAM ប្រមូល ប្រើ និងរក្សាទុក។",
 };
 
 export default function PrivacyPage() {
   return (
     <main className="connections-page privacy-page">
       <header className="connections-header">
-        <Link href="/" className="connections-brand">RFX TEAM · RITH FX BTC</Link>
+        <Link href="/" className="connections-brand">RFX TEAM · RFX BTC TEAM</Link>
         <Link href="/dashboard" className="connections-back">← ត្រឡប់ទៅ Dashboard</Link>
       </header>
       <div className="connections-content">
         <section className="connections-intro">
           <p className="connections-eyebrow">PRIVACY · សេចក្តីព្រាងសម្រាប់ពិនិត្យ</p>
           <h1>សេចក្តីជូនដំណឹងអំពីឯកជនភាព</h1>
-          <p>សេចក្តីជូនដំណឹងនេះពន្យល់អំពីទិន្នន័យដែលប្រព័ន្ធ RITH FX BTC ប្រើ។ ម្ចាស់សេវាត្រូវបញ្ជាក់អត្តសញ្ញាណផ្លូវច្បាប់ និងអនុម័តខ្លឹមសារនេះ មុនបើកសេវាសាធារណៈ។</p>
+          <p>សេចក្តីជូនដំណឹងនេះពន្យល់អំពីទិន្នន័យដែលប្រព័ន្ធ RFX BTC TEAM ប្រើ។ ម្ចាស់សេវាត្រូវបញ្ជាក់អត្តសញ្ញាណផ្លូវច្បាប់ និងអនុម័តខ្លឹមសារនេះ មុនបើកសេវាសាធារណៈ។</p>
         </section>
         <div className="privacy-sections">
           <section>
@@ -26,7 +26,7 @@ export default function PrivacyPage() {
               <li>អ៊ីមែល ពាក្យសម្ងាត់ដែលបាន hash ឈ្មោះបង្ហាញ រូបភាព Profile និងព័ត៌មានគណនីដែលអ្នកបញ្ចូល។</li>
               <li>អាសយដ្ឋាន IP សម្រាប់ការចុះឈ្មោះ និងការចូលចុងក្រោយ ព្រមទាំងសកម្មភាពអនុម័តសមាជិកសម្រាប់សុវត្ថិភាព។</li>
               <li>របាយការណ៍វិភាគទីផ្សារ និងការកំណត់ដែលភ្ជាប់នឹងគណនី។ របាយការណ៍ Candle ត្រូវបានរក្សាទុករហូតដល់ 100 ក្នុងមួយគណនី។</li>
-              <li>ប្រសិនបើអ្នកប្រើមុខងារ AI សំណួរ និងបរិបទទីផ្សារដែលបង្ហាញអាចត្រូវបានផ្ញើទៅ Google Gemini។ រូបភាពក្រាបត្រូវបានផ្ញើទៅ Gemini នៅពេលអ្នកស្នើឲ្យអានរូប។ កុំដាក់ពាក្យសម្ងាត់ ឬព័ត៌មានសម្ងាត់ក្នុងសំណួរ ឬរូបភាព។</li>
+              <li>ប្រសិនបើអ្នកប្រើមុខងារ AI សំណួរ ប្រវត្តិសន្ទនាថ្មីៗ និងបរិបទទីផ្សារដែលបង្ហាញអាចត្រូវបានផ្ញើទៅ Google Gemini ដើម្បីបង្កើតចម្លើយ។ ប្រសិនបើសំណួរទាមទារព័ត៌មានថ្មីៗ AI អាចប្រើ Google Search តាម Gemini ហើយបង្ហាញប្រភពដែលបានប្រើ។ សំឡេងនិយាយអាចត្រូវបានដំណើរការដោយសេវាសម្គាល់សម្លេងរបស់ browser/ប្រព័ន្ធប្រតិបត្តិការ ហើយអត្ថបទដែលបានស្គាល់នឹងផ្ញើទៅ Gemini។ រូបភាពក្រាបត្រូវបានផ្ញើទៅ Gemini នៅពេលអ្នកស្នើឲ្យអានរូប។ ប្រសិនបើបានកំណត់ Telegram Bot សញ្ញាបច្ចេកទេសថ្មី Entry/TP/SL នឹងត្រូវបានបង្ហោះទៅក្រុម Telegram ដែលបានកំណត់។ កុំដាក់ពាក្យសម្ងាត់ ឬព័ត៌មានសម្ងាត់ក្នុងសំណួរ សំឡេង ឬរូបភាព។</li>
               <li>ប្រសិនបើអ្នកប្រើគណនី Exchange ឬសេវាទូទាត់ ប្រព័ន្ធអាចរក្សាទុកទិន្នន័យដែលចាំបាច់សម្រាប់មុខងារនោះ។ សោភ្ជាប់ Exchange ត្រូវការការកំណត់ encryption នៅលើ server។</li>
               <li>សារ Support ដែលអ្នកផ្ញើ និងព័ត៌មានចាំបាច់សម្រាប់ផ្ញើអ៊ីមែលផ្ទៀងផ្ទាត់ និងអនុម័តសមាជិក។</li>
             </ul>

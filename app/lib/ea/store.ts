@@ -195,3 +195,9 @@ export function listEnabledEaUsers() {
     FROM ea_bot_settings s JOIN users u ON u.id=s.user_id
     WHERE s.enabled=1 AND s.testnet_verified=1 AND u.status='approved' AND u.access_enabled=1 AND u.email_verified=1`);
 }
+
+export function listEnabledEaUserIds() {
+  return query<{ userId: string }>(`SELECT DISTINCT s.user_id AS userId
+    FROM ea_bot_settings s JOIN users u ON u.id=s.user_id
+    WHERE s.enabled=1 AND s.testnet_verified=1 AND u.status='approved' AND u.access_enabled=1 AND u.email_verified=1`);
+}

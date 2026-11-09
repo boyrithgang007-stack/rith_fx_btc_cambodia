@@ -48,6 +48,12 @@ const schemaStatements = [
     market TEXT NOT NULL, frame TEXT NOT NULL, generated_at BIGINT NOT NULL, report_json TEXT NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS candle_analysis_reports_user_created_idx ON candle_analysis_reports(user_id, generated_at DESC)`,
+  `CREATE TABLE IF NOT EXISTS telegram_signal_deliveries (
+    signal_key TEXT PRIMARY KEY, market TEXT NOT NULL, frame TEXT NOT NULL, candle_time BIGINT NOT NULL,
+    direction TEXT NOT NULL CHECK(direction IN ('BUY','SELL')),
+    status TEXT NOT NULL CHECK(status IN ('sending','sent','failed','unknown')),
+    attempted_at BIGINT NOT NULL, sent_at BIGINT, telegram_message_id BIGINT, last_error TEXT
+  )`,
   `CREATE TABLE IF NOT EXISTS trading_risk_settings (
     user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
     max_order_cents INTEGER NOT NULL CHECK(max_order_cents BETWEEN 100 AND 10000000),

@@ -60,16 +60,11 @@ export default function TradingRiskSettings() {
     <form className="trading-risk-form" onSubmit={(event) => void save(event)}>
       <label className="settings-field">Notional អតិបរមាក្នុងមួយ order (USD)<input type="number" min="1" max="100000" step="0.01" value={maxOrder} onChange={event => setMaxOrder(event.target.value)} required disabled={loading || saving} /></label>
       <label className="settings-field">Notional សរុបអតិបរមាប្រចាំថ្ងៃ (USD)<input type="number" min="1" max="1000000" step="0.01" value={dailyLimit} onChange={event => setDailyLimit(event.target.value)} required disabled={loading || saving} /></label>
-      <div className="trading-risk-guidance">
-        <p><strong>ចំណាំ</strong><span>កម្រិតសរុបប្រចាំថ្ងៃ ត្រូវស្មើ ឬខ្ពស់ជាងកម្រិតក្នុងមួយ order។</span></p>
-        <div className="trading-risk-defaults"><span>តម្លៃដើម</span><strong>${DEFAULTS.maxOrderUsd} / order</strong><span aria-hidden="true">·</span><strong>${DEFAULTS.dailyLimitUsd} / ថ្ងៃ</strong></div>
-      </div>
+      <p className="settings-hint">កម្រិតប្រចាំថ្ងៃត្រូវស្មើ ឬធំជាងកម្រិតក្នុងមួយ order។ លំនាំដើម៖ ${DEFAULTS.maxOrderUsd} / order និង ${DEFAULTS.dailyLimitUsd} / ថ្ងៃ។</p>
       {settings.updatedAt && <p className="settings-hint">រក្សាទុកចុងក្រោយ៖ {new Date(settings.updatedAt).toLocaleString("km-KH")}</p>}
       {error && <p className="auth-error" role="alert">{error}</p>}
       {message && <p className="auth-success" role="status">{message}</p>}
-      <div className="trading-risk-actions">
-        <ControlButton variant="primary" className="settings-primary-button" type="submit" disabled={loading || saving}>{loading ? "កំពុងទាញ…" : saving ? "កំពុងរក្សាទុក…" : "រក្សាទុកការកំណត់"}</ControlButton>
-      </div>
+      <ControlButton variant="primary" className="settings-primary-button" type="submit" disabled={loading || saving}>{loading ? "កំពុងទាញ…" : saving ? "កំពុងរក្សាទុក…" : "រក្សាទុកកម្រិតហានិភ័យ"}</ControlButton>
     </form>
   </article>;
 }

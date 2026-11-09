@@ -9,7 +9,7 @@ export function parseBinanceCandles(payload:unknown,intervalMs:number,now:number
     const [open,high,low,close,volume]=row.slice(1,6).map(Number);
     if(row.slice(1,6).some(v=>typeof v!=="string"&&typeof v!=="number")||![open,high,low,close,volume].every(Number.isFinite)||volume<0)throw new CandleFeedError("Invalid candle values.");
     if(row[0]>now)throw new CandleFeedError("Future candle data rejected.");
-    if(row[6]+1<=now)candles.push({time:row[6]+1,open,high,low,close,volume});
+    if(row[6]+1<=now){const takerBuyVolume=row.length>9?Number(row[9]):undefined;if(takerBuyVolume!==undefined&&(!Number.isFinite(takerBuyVolume)||takerBuyVolume<0||takerBuyVolume>volume))throw new CandleFeedError("Invalid Binance taker buy volume.");candles.push({time:row[6]+1,open,high,low,close,volume,...(takerBuyVolume===undefined?{}:{takerBuyVolume})});}
   }
   if(!validCandles(candles))throw new CandleFeedError("Invalid candle ordering or OHLC bounds.");
   return candles;

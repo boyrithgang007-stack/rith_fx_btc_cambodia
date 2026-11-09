@@ -1,0 +1,12 @@
+.env*
+.git
+.next
+.npm-cache
+.preview
+.review
+.tmp
+node_modules
+data
+backups
+*.tsbuildinfo
+services

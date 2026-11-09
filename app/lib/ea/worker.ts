@@ -12,6 +12,7 @@ import {
   disableEa,
   getEaCredentials,
   hasEaRun,
+  listEnabledEaUserIds,
   listEnabledEaUsers,
   updateEaRun,
   type EaSettings,
@@ -198,8 +199,8 @@ async function processUser(userId: string, symbol: EaSymbol, settings: EaSetting
   }
 }
 
-export async function runEaPass() {
-  const enabledUsers = await listEnabledEaUsers();
+export async function runEaPass(userId: string) {
+  const enabledUsers = (await listEnabledEaUsers()).filter(user => user.userId === userId);
   for (const user of enabledUsers) {
     try {
       await processUser(user.userId, user.symbol, {
@@ -217,13 +218,33 @@ export async function runEaPass() {
 }
 
 declare global {
-  var __rfxEaWorker: NodeJS.Timeout | undefined;
+  var __rfxEaWorkers: Map<string, NodeJS.Timeout> | undefined;
 }
 
-export function startEaWorker() {
-  if (process.env.NODE_ENV === "test" || process.env.VERCEL === "1" || globalThis.__rfxEaWorker) return;
-  const tick = () => { void runEaPass().catch(error => console.error("[ea-worker] EA pass failed:", error instanceof Error ? error.message : "Unknown error")); };
-  globalThis.__rfxEaWorker = setInterval(tick, POLL_INTERVAL);
-  globalThis.__rfxEaWorker.unref();
+export function isEaWorkerRunning(userId: string) {
+  return globalThis.__rfxEaWorkers?.has(userId) ?? false;
+}
+
+export function startEaWorker(userId: string) {
+  if (!userId || process.env.NODE_ENV === "test" || process.env.NEXT_PHASE === "phase-production-build"
+      || process.env.VERCEL === "1" || isEaWorkerRunning(userId)) return;
+  globalThis.__rfxEaWorkers ??= new Map<string, NodeJS.Timeout>();
+  const tick = () => { void runEaPass(userId).catch(error => console.error("[ea-worker] EA pass failed:", error instanceof Error ? error.message : "Unknown error")); };
+  const timer = setInterval(tick, POLL_INTERVAL);
+  globalThis.__rfxEaWorkers.set(userId, timer);
+  timer.unref();
   tick();
+}
+
+export function stopEaWorker(userId: string) {
+  const timer = globalThis.__rfxEaWorkers?.get(userId);
+  if (timer) clearInterval(timer);
+  globalThis.__rfxEaWorkers?.delete(userId);
+}
+
+export async function startEnabledEaWorkers() {
+  if (process.env.NODE_ENV === "test" || process.env.NEXT_PHASE === "phase-production-build"
+      || process.env.VERCEL === "1") return;
+  const users = await listEnabledEaUserIds();
+  for (const { userId } of users) startEaWorker(userId);
 }

@@ -25,6 +25,7 @@ export default async function ConnectionsPage() {
         </section>
 
         <section className="account-hub-grid" aria-label="ផ្នែកគណនីនីមួយៗ">
+          <Link href="/ea/setup"><span>00 · AUTOMATION</span><h2>រៀបចំគណនី EA</h2><p>Binance Futures Testnet · MT5</p><b>បើក EA setup ↗</b></Link>
           <Link href="/accounts/balances"><span>01 · BALANCES</span><h2>សមតុល្យគណនី</h2><p>ស្ថានភាពសមតុល្យដែលបានអនុញ្ញាត</p><b>បើកផ្នែក ↗</b></Link>
           <Link href="/accounts/exchanges"><span>02 · CRYPTO</span><h2>Exchange accounts</h2><p>Binance · Bitget · OKX</p><b>បើកផ្នែក ↗</b></Link>
           <Link href="/accounts/mt5"><span>03 · FOREX</span><h2>MetaTrader 5</h2><p>គណនី MT5 តាម broker bridge</p><b>បើកផ្នែក ↗</b></Link>

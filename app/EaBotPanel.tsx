@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 type Settings = { symbol: string; capitalUsd: number; riskPercent: number; leverage: number; enabled: boolean; updatedAt: string | null };
 type Run = { symbol: string; candleTime: number; status: string; message: string; orderId: string | null; createdAt: string };
 type Audit = { action: string; createdAt: string };
-type Snapshot = { settings: Settings; automationAvailable: boolean; encryptionConfigured: boolean; credentialsConfigured: boolean; testnetVerified: boolean; runs: Run[]; audit: Audit[] };
+type Snapshot = { settings: Settings; automationAvailable: boolean; encryptionConfigured: boolean; credentialsConfigured: boolean; testnetVerified: boolean; workerRunning: boolean; runs: Run[]; audit: Audit[] };
 
 const initialSettings: Settings = { symbol: "BTCUSDT", capitalUsd: 100, riskPercent: 1, leverage: 3, enabled: false, updatedAt: null };
 
@@ -81,7 +81,7 @@ export default function EaBotPanel() {
   return <section className="ea-bot" aria-labelledby="ea-bot-title">
     <div className="ea-bot-heading">
       <div><p className="eyebrow">BINANCE USDⓈ-M FUTURES · AUTOMATION</p><h3 id="ea-bot-title">EA Bot · Testnet</h3></div>
-      <span className={settings.enabled && snapshot?.testnetVerified && snapshot?.automationAvailable ? "ea-state ea-state-on" : "ea-state"}>{settings.enabled && snapshot?.testnetVerified && snapshot?.automationAvailable ? "TESTNET RUNNING" : settings.enabled && !snapshot?.automationAvailable ? "WORKER UNAVAILABLE" : "DISABLED"}</span>
+      <span className={settings.enabled && snapshot?.testnetVerified && snapshot?.workerRunning ? "ea-state ea-state-on" : "ea-state"}>{settings.enabled && snapshot?.testnetVerified && snapshot?.workerRunning ? "TESTNET RUNNING" : settings.enabled && !snapshot?.automationAvailable ? "WORKER UNAVAILABLE" : settings.enabled ? "WORKER STARTING" : "DISABLED"}</span>
     </div>
     <p className="ea-bot-notice">ដំណាក់កាលនេះប្រើ Testnet ប៉ុណ្ណោះ — មិនអាចដាក់ order លើគណនីពិតបានទេ។ Live mode ត្រូវការការសាកល្បង Testnet និងការបើកដោយដៃដាច់ដោយឡែក។ Futures មានហានិភ័យខ្ពស់ ហើយអាចបាត់បង់ដើមទុនទាំងស្រុង។</p>
     {!loading && <div className="ea-readiness" aria-label="ស្ថានភាពត្រៀមប្រើ EA">

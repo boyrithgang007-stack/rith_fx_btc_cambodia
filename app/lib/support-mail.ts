@@ -16,7 +16,7 @@ export async function sendSupportMessage(sender: string, message: string) {
     from: config.from,
     to: [SUPPORT_EMAIL],
     replyTo: sender,
-    subject: `RITH FX BTC support request from ${sender}`,
+    subject: `RFX BTC TEAM support request from ${sender}`,
     text: `Support request from: ${sender}\nReceived: ${new Date().toISOString()}\n\n${message}`,
   };
 

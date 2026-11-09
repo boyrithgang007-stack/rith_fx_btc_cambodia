@@ -14,6 +14,7 @@ import {
   saveEaSettings,
 } from "@/app/lib/ea/store";
 import { assertVaultConfigured, VaultConfigurationError } from "@/app/lib/exchanges/vault";
+import { isEaWorkerRunning, startEaWorker, stopEaWorker } from "@/app/lib/ea/worker";
 
 export const runtime = "nodejs";
 
@@ -30,6 +31,7 @@ export async function GET() {
     encryptionConfigured: encryptionConfigured(),
     credentialsConfigured: await hasEaCredentials(user.id),
     testnetVerified: await isEaTestnetVerified(user.id),
+    workerRunning: isEaWorkerRunning(user.id),
     runs: await listEaRuns(user.id),
     audit: await listEaAuditEvents(user.id),
   }, { headers: { "Cache-Control": "no-store" } });
@@ -59,12 +61,16 @@ export async function POST(request: Request) {
     } else if (settings.enabled && (!(await hasEaCredentials(user.id)) || !(await isEaTestnetVerified(user.id)))) {
       return authJson("សូមភ្ជាប់ និងផ្ទៀងផ្ទាត់ Binance Futures Testnet មុនបើក EA។", 409);
     }
+    const savedSettings = await saveEaSettings(user.id, settings);
+    if (settings.enabled) startEaWorker(user.id);
+    else stopEaWorker(user.id);
     return Response.json({
-      settings: await saveEaSettings(user.id, settings),
+      settings: savedSettings,
       automationAvailable: process.env.VERCEL !== "1",
       encryptionConfigured: encryptionConfigured(),
       credentialsConfigured: await hasEaCredentials(user.id),
       testnetVerified: await isEaTestnetVerified(user.id),
+      workerRunning: isEaWorkerRunning(user.id),
       runs: await listEaRuns(user.id),
       audit: await listEaAuditEvents(user.id),
     }, { headers: { "Cache-Control": "no-store" } });
@@ -81,5 +87,6 @@ export async function DELETE(request: Request) {
   if (!user) return authJson("សូមចូលគណនីដែលបានអនុម័តជាមុន។", 401);
   if (!allowAuthAttempt(`ea-disconnect:${user.id}`, 5, 60000)) return authJson("ព្យាយាមច្រើនដងពេក។ សូមរង់ចាំមួយនាទី។", 429);
   await removeEaCredentials(user.id);
+  stopEaWorker(user.id);
   return Response.json({ disconnected: true }, { headers: { "Cache-Control": "no-store" } });
 }

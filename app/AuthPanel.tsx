@@ -58,10 +58,10 @@ export default function AuthPanel({ redirectTo = "/dashboard" }: { redirectTo?: 
   return <main className={`access-screen theme-${theme}`} aria-label="Account access">
     <Link href="/" className="access-home-link">← ត្រឡប់ទៅទំព័រដើម</Link>
     <section className="access-card">
-      <aside className="auth-visual" aria-label="RITH FX BTC Cambodia">
+      <aside className="auth-visual" aria-label="RFX BTC TEAM Cambodia">
         <Link className="auth-visual-brand" href="/">
           <span className="auth-visual-mark">RFX</span>
-          <span><strong>RITH FX BTC</strong><small>CAMBODIA · RFX TEAM</small></span>
+          <span><strong>RFX BTC TEAM</strong><small>CAMBODIA · RFX TEAM</small></span>
         </Link>
         <div className="auth-visual-copy">
           <p className="auth-visual-eyebrow"><span /> MARKET OBSERVATORY</p>
@@ -75,7 +75,7 @@ export default function AuthPanel({ redirectTo = "/dashboard" }: { redirectTo?: 
       </aside>
       <div className="auth-form-wrap">
         <ControlButton className="auth-theme-toggle" type="button" onClick={toggleAppTheme} aria-label={theme === "dark" ? "ប្តូរទៅរបៀបភ្លឺ" : "ប្តូរទៅរបៀបងងឹត"}>{theme === "dark" ? "☼" : "☾"}<span>{theme === "dark" ? "Light mode" : "Dark mode"}</span></ControlButton>
-        <Link className="auth-mobile-brand access-brand" href="/"><span className="brand-symbol">RFX</span><span><strong>RITH FX BTC Cambodia</strong><small>FOREX · BINANCE · COMMODITIES</small></span></Link>
+        <Link className="auth-mobile-brand access-brand" href="/"><span className="brand-symbol">RFX</span><span><strong>RFX BTC TEAM Cambodia</strong><small>FOREX · BINANCE · COMMODITIES</small></span></Link>
         <div className="auth-heading"><p className="eyebrow">SECURE WORKSPACE</p><h2>{mode === "login" ? "សូមស្វាគមន៍ត្រឡប់មកវិញ" : "បង្កើតគណនីថ្មី"}</h2><p>{mode === "login" ? "ចូលគណនីដើម្បីបើក market dashboard។" : "ផ្ទៀងផ្ទាត់អ៊ីមែល រួចរង់ចាំអ្នកគ្រប់គ្រងអនុម័ត មុនអាចចូលប្រើបាន។"}</p></div>
         <div className="auth-mode-switch" role="tablist" aria-label="ជ្រើសរើសសកម្មភាព"><ControlButton type="button" role="tab" aria-selected={mode === "login"} className={mode === "login" ? "active" : ""} onClick={() => changeMode("login")}>ចូលគណនី</ControlButton><ControlButton type="button" role="tab" aria-selected={mode === "register"} className={mode === "register" ? "active" : ""} onClick={() => changeMode("register")}>ចុះឈ្មោះ</ControlButton></div>
         <form className="auth-form" onSubmit={submit}>

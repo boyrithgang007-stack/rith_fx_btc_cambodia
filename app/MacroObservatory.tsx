@@ -56,7 +56,7 @@ const copy = {
     assistantDescription: "សួរអំពី CPI, Forex និង Crypto។ AI ប្រើទិន្នន័យដែលបង្ហាញ ហើយមិនបង្កើតតម្លៃបច្ចុប្បន្នទេ។",
     yourQuestion: "សំណួររបស់អ្នក", questionPlaceholder: "តើ CPI លើកក្រោយនៅពេលណា?", ask: "សួរ AI ↗",
     choosePrompt: "ជ្រើសសំណួរ ឬវាយសំណួររបស់អ្នក ដើម្បីចាប់ផ្ដើមជជែកជាមួយ AI។",
-    aiSetupNote: "មុខងារ AI មិនទាន់បានកំណត់ទេ។ សូមកំណត់ GEMINI_API_KEY និង GEMINI_ANALYSIS_MODEL នៅលើ Server។",
+    aiSetupNote: "មុខងារជំនួយការទីផ្សារមិនទាន់អាចប្រើបានទេ។ សូមទាក់ទង Support។",
     aiError: "មិនអាចទទួលចម្លើយពី AI បានទេ។ សូមសាកល្បងម្ដងទៀត។",
     calendarConnected: "ប្រតិទិន BLS បានភ្ជាប់", calendarUnavailable: "មិនអាចភ្ជាប់ប្រតិទិនបាន — សូមពិនិត្យ BLS",
     socialNotConnected: "X មិនទាន់បានភ្ជាប់ — សូមបិទភ្ជាប់ប្រកាសខាងក្រោម",
@@ -98,7 +98,7 @@ const copy = {
     assistantDescription: "Ask about CPI, Forex, and crypto. AI uses the displayed context and will not invent current prices.",
     yourQuestion: "Your question", questionPlaceholder: "When is the next CPI?", ask: "Ask AI ↗",
     choosePrompt: "Choose a prompt or enter your own question to start chatting with AI.",
-    aiSetupNote: "AI is not configured. Set GEMINI_API_KEY and GEMINI_ANALYSIS_MODEL on the server.",
+    aiSetupNote: "The market assistant is temporarily unavailable. Please contact Support.",
     aiError: "AI could not answer. Please try again.",
     calendarConnected: "BLS calendar connected", calendarUnavailable: "Calendar unavailable — check BLS directly",
     socialNotConnected: "X not connected — paste a post below",
@@ -126,6 +126,7 @@ export default function MacroObservatory({ quotes, updatedAt }: { quotes: {symbo
   const [question, setQuestion] = useState("");
   const [assistantIntent, setAssistantIntent] = useState("");
   const [answer, setAnswer] = useState("");
+  const [answerSources,setAnswerSources]=useState<{name:string;url:string;status:string;checkedAt:number}[]>([]);
   const [assistantBusy, setAssistantBusy] = useState(false);
   const [assistantError, setAssistantError] = useState("");
 
@@ -204,6 +205,7 @@ export default function MacroObservatory({ quotes, updatedAt }: { quotes: {symbo
     setAssistantIntent(prompt);
     setAssistantError("");
     setAnswer("");
+    setAnswerSources([]);
     setAssistantBusy(true);
     const parsedPriceTime = updatedAt ? Date.parse(updatedAt) : NaN;
     try {
@@ -235,6 +237,7 @@ export default function MacroObservatory({ quotes, updatedAt }: { quotes: {symbo
       if (!response.ok) throw new Error(typeof result.error === "string" ? result.error : text.aiError);
       if (typeof result.answer !== "string" || !result.answer.trim()) throw new Error(text.aiError);
       setAnswer(result.answer);
+      setAnswerSources(Array.isArray(result.sources)?result.sources.filter((s:{url?:string})=>typeof s?.url==="string"&&/^https:\/\/(www\.bls\.gov|nfs\.faireconomy\.media|api\.coingecko\.com)\//.test(s.url)):[]);
     } catch (reason) {
       setAssistantError(reason instanceof Error && reason.name !== "TimeoutError" ? reason.message : text.aiError);
     } finally {
@@ -304,6 +307,7 @@ export default function MacroObservatory({ quotes, updatedAt }: { quotes: {symbo
         {!aiConfigured && <p className="signal-setup-note">{text.aiSetupNote}</p>}
         {assistantError && <p className="signal-error" role="alert">{assistantError}</p>}
         <div className="macro-answer" role="status">{assistantBusy ? (language === "km" ? "AI កំពុងរៀបចំចម្លើយ…" : "AI is preparing an answer…") : answer || text.choosePrompt}</div>
+        {answerSources.length>0&&<div className="macro-answer-sources"><h4>{language==="km"?"ប្រភពសម្រាប់ចម្លើយនេះ":"Sources for this answer"}</h4>{answerSources.map(source=><p key={source.name}><a href={source.url} target="_blank" rel="noreferrer">{source.name} ↗</a> · {source.status==="available"?"Connected":"Unavailable"} · {new Date(source.checkedAt).toLocaleTimeString("en-GB",{timeZone:"Asia/Bangkok"})} UTC+7</p>)}</div>}
         <a href="https://www.bls.gov/cpi/questions-and-answers.htm" target="_blank" rel="noreferrer">{language === "km" ? "ស្វែងយល់អំពី CPI · BLS ↗" : "Learn about CPI · BLS ↗"}</a>
       </article>
     </div>
